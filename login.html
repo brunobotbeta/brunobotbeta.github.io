@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login</title>
   <style>
+    /* Basic styling for the login page */
     body {
       font-family: Arial, sans-serif;
       background-color: #f4f4f4;
@@ -62,12 +63,12 @@
   </div>
 
   <script>
-    // Manually adding user Bruno with password Bruno
+    // Initialize the users data (you can manually add the Bruno user here)
     const defaultUsers = [
-      { username: "Bruno", password: "Bruno", accepted: true } // Bruno is accepted by default
+      { username: "Bruno", password: "Bruno", accepted: true } // Bruno is already accepted
     ];
 
-    // Store default users in localStorage
+    // Store the users in localStorage
     if (!localStorage.getItem("users")) {
       localStorage.setItem("users", JSON.stringify(defaultUsers));
     }
