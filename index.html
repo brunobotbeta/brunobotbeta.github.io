@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Location Check</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: #333;
+        }
+        .message-box {
+            padding: 20px;
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            background: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+        p {
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="message-box" id="message-box">
+        <h1>Checking Your Location...</h1>
+        <p id="message">Please wait while we verify your access.</p>
+    </div>
+
+    <script>
+        // Your IPStack API key
+        const apiKey = '78d84e11ef4653ba1d4031c10a2f7808';
+
+        // Fetch location information from IPStack API
+        fetch(`http://api.ipstack.com/check?access_key=${apiKey}`)
+            .then(response => response.json())
+            .then(data => {
+                const country = data.country_name; // Get the user's country
+                if (country === "United Kingdom") {
+                    // Redirect to the Google Sites page if in the UK
+                    window.location.href = "https://sites.google.com/view/brunotools/brunobot";
+                } else {
+                    // Show a message if not in the UK
+                    document.getElementById("message-box").innerHTML = `
+                        <h1>Access Restricted</h1>
+                        <p>Sorry, this site is only available to users in the United Kingdom.</p>
+                        <p>Your location: ${country}</p>
+                    `;
+                }
+            })
+            .catch(error => {
+                // Handle errors (e.g., API fails to load)
+                document.getElementById("message-box").innerHTML = `
+                    <h1>Error</h1>
+                    <p>Unable to determine your location. Please try again later.</p>
+                `;
+                console.error("Error fetching location:", error);
+            });
+    </script>
+</body>
+</html>
