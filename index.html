@@ -4,169 +4,236 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BrunoBot</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      background: url('https://londonmymind.com/wp-content/uploads/2022/01/Sunset-in-London-Hero-2-1024x683.jpg') no-repeat center center fixed;
-      background-size: cover;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      height: 100vh;
-      overflow: hidden;
-    }
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div id="chat-container">
+    <div id="chat-box"></div>
+    <input type="text" id="user-input" placeholder="Type here..." />
+    <button id="logout-btn">Logout</button>
+  </div>
 
-    .bot-container {
-      background: rgba(255, 255, 255, 0.95);
-      border-radius: 10px;
-      padding: 20px;
-      margin-top: 20px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      text-align: center;
-    }
-
-    h1 {
-      color: #007bff;
-      font-size: 2rem;
-      margin: 20px 0;
-    }
-
-    .chat-area {
-      background: #f4f4f9;
-      border: 1px solid #ddd;
-      border-radius: 10px;
-      height: 300px;
-      overflow-y: auto;
-      padding: 10px;
-      margin-bottom: 15px;
-    }
-
-    .input-area {
-      display: flex;
-      gap: 10px;
-    }
-
-    input {
-      flex-grow: 1;
-      padding: 10px;
-      border-radius: 5px;
-      border: 1px solid #ddd;
-    }
-
-    button {
-      background-color: #007bff;
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-    }
-
-    button:hover {
-      background-color: #0056b3;
-    }
-
-    #logoutBtn {
-      background-color: red;
-      color: white;
-      margin-top: 10px;
-      padding: 5px 15px;
-      border-radius: 5px;
-    }
-
-    #logoutBtn:hover {
-      background-color: darkred;
-    }
-  </style>
   <script>
-    // Check for logged-in user, if not, redirect to login.html
-    const loggedInUser = localStorage.getItem('loggedInUser');
-    if (!loggedInUser) {
-      alert('You must log in to access this page!');
-      window.location.href = 'login.html'; // Redirect if not logged in
+    // Check if the user is logged in by checking localStorage
+    if (!localStorage.getItem("loggedInUser")) {
+      window.location.href = "login.html"; // Redirect if not logged in
     }
 
-    // Logout functionality
-    const logout = () => {
-      localStorage.removeItem('loggedInUser');
-      window.location.href = 'login.html'; // Redirect to login page after logout
-    };
+    // Handle user input and commands
+    const inputField = document.getElementById("user-input");
+    const chatBox = document.getElementById("chat-box");
 
-    // Handle user input and respond
-    const handleUserInput = () => {
-      const userInput = document.getElementById('userInput').value.trim().toLowerCase();
-      const chatArea = document.getElementById('chatArea');
-
-      if (userInput === '') {
-        chatArea.innerHTML += `<p><strong>BrunoBot:</strong> Please say something!</p>`;
-        return;
+    inputField.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        let userInput = inputField.value.toLowerCase();
+        let response = handleUserCommands(userInput); // Calls the function to check commands
+        chatBox.innerHTML += `<p>User: ${userInput}</p>`;
+        chatBox.innerHTML += `<p>BrunoBot: ${response}</p>`;
+        inputField.value = ""; // Clear the input field
       }
+    });
 
-      let response = '';
+    // Handle the logout button
+    document.getElementById("logout-btn").addEventListener("click", () => {
+      localStorage.removeItem("loggedInUser"); // Clear user from localStorage
+      window.location.href = "login.html"; // Redirect to login page
+    });
+
+    // Command function handling
+    function handleUserCommands(userInput) {
+      let response = "";
+
       switch (userInput) {
-        case 'hello':
-        case 'hi':
-          response = 'Hello! How can I assist you today?';
+        case "hello":
+        case "hi":
+          response = "Hello! How can I assist you today?";
           break;
-        case 'what is my name':
-          const storedName = localStorage.getItem('userName');
-          response = storedName ? `Your name is ${storedName}!` : "I don't know your name yet.";
+        case "what is my name":
+          const userName = localStorage.getItem("userName");
+          response = userName ? `Your name is ${userName}!` : "I don't know your name yet.";
           break;
-        case 'time in london':
+        case "weather in london":
+          response = "The weather in London is sunny with 15°C.";
+          break;
+        case "time in london":
           const now = new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' });
           response = `The current time in London is ${now}.`;
           break;
-        case 'weather in london':
-          response = "The weather in London is currently sunny with 15°C.";
+        case "tell me a joke":
+          response = 'Why don’t skeletons fight each other? They don’t have the guts!';
           break;
-        case 'what is brunle':
-          response = 'Brunle is a word guessing game where you try to guess a 5-letter word!';
+        case "how old are you?":
+          response = 'I am an AI, so I don’t age! But I’m always here to assist you.';
           break;
-        case 'facts':
-          response = 'Did you know that honey never spoils? Archaeologists have found pots of honey in ancient tombs that are still good to eat!';
+        case "who are you?":
+          response = 'I am BrunoBot, your friendly assistant!';
           break;
-        case 'name my city':
-          const favCity = localStorage.getItem('favCity');
-          response = favCity ? `Your favorite city is ${favCity}!` : "I don't know your favorite city yet.";
+        case "do you like cats?":
+          response = 'I think cats are fascinating creatures!';
           break;
-        case 'what is your name':
-          response = "I am BrunoBot. Nice to meet you!";
+        case "do you like dogs?":
+          response = 'Dogs are amazing! I think they make great companions.';
           break;
-        case 'help':
-        case 'what can i do here?':
-          response = 'You can ask me to tell you the time, weather, facts, play Brunle, and more! Type in a command and I’ll assist.';
+        case "what is 2 + 2?":
+          response = '2 + 2 equals 4.';
+          break;
+        case "what is the square root of 16?":
+          response = 'The square root of 16 is 4.';
+          break;
+        case "what is the fastest animal on land?":
+          response = 'The fastest animal on land is the cheetah, reaching speeds up to 60 mph!';
+          break;
+        case "what is the largest country?":
+          response = 'Russia is the largest country in the world by land area.';
+          break;
+        case "how many continents are there?":
+          response = 'There are seven continents on Earth.';
+          break;
+        case "how many countries are there?":
+          response = 'There are 195 countries in the world.';
+          break;
+        case "what is the capital of france?":
+          response = 'The capital of France is Paris.';
+          break;
+        case "what is the capital of japan?":
+          response = 'The capital of Japan is Tokyo.';
+          break;
+        case "what is the fastest bird?":
+          response = 'The fastest bird is the peregrine falcon, which can dive at speeds over 200 mph.';
+          break;
+        case "what is the longest river?":
+          response = 'The longest river in the world is the Nile River.';
+          break;
+        case "what is the largest desert?":
+          response = 'The largest desert in the world is the Antarctic Desert.';
+          break;
+        case "what is the largest ocean?":
+          response = 'The Pacific Ocean is the largest ocean on Earth.';
+          break;
+        case "do you know any programming languages?":
+          response = 'Yes, I am familiar with languages like JavaScript, Python, and many others!';
+          break;
+        case "what is java?":
+          response = 'Java is a high-level programming language used for building applications.';
+          break;
+        case "what is python?":
+          response = 'Python is a high-level programming language used for web development, automation, and data analysis.';
+          break;
+        case "tell me about the internet":
+          response = 'The internet is a global network that connects millions of computers and devices worldwide.';
+          break;
+        case "how far is the moon from earth?":
+          response = 'The average distance from Earth to the Moon is about 384,400 km.';
+          break;
+        case "how many days are in a year?":
+          response = 'There are 365 days in a year, except in leap years when there are 366 days.';
+          break;
+        case "how many days in a leap year?":
+          response = 'There are 366 days in a leap year.';
+          break;
+        case "what is the largest planet in our solar system?":
+          response = 'Jupiter is the largest planet in our solar system.';
+          break;
+        case "what is the coldest planet?":
+          response = 'Uranus is the coldest planet in our solar system.';
+          break;
+        case "how much is 50 plus 30?":
+          response = '50 plus 30 equals 80.';
+          break;
+        case "who invented the telephone?":
+          response = 'Alexander Graham Bell is credited with inventing the telephone.';
+          break;
+        case "who invented the lightbulb?":
+          response = 'Thomas Edison is credited with inventing the practical lightbulb.';
+          break;
+        case "what is the capital of canada?":
+          response = 'The capital of Canada is Ottawa.';
+          break;
+        case "what is the capital of australia?":
+          response = 'The capital of Australia is Canberra.';
+          break;
+        case "what is the capital of germany?":
+          response = 'The capital of Germany is Berlin.';
+          break;
+        case "what is the capital of italy?":
+          response = 'The capital of Italy is Rome.';
+          break;
+        case "how many oceans are there?":
+          response = 'There are five oceans on Earth.';
+          break;
+        case "what is the fastest car in the world?":
+          response = 'The fastest car in the world is the Bugatti Chiron Super Sport 300+.';
+          break;
+        case "what is the biggest animal on Earth?":
+          response = 'The blue whale is the largest animal on Earth!';
+          break;
+        case "what is the tallest mountain?":
+          response = 'Mount Everest is the tallest mountain on Earth, standing at 8,848 meters.';
+          break;
+        case "tell me a fun fact":
+          response = 'Did you know octopuses have three hearts?';
+          break;
+        case "do you know any facts about space?":
+          response = 'Space is infinite and contains billions of galaxies, stars, and planets.';
+          break;
+        case "how do you work?":
+          response = 'I work by processing your input and providing helpful responses based on what I know.';
+          break;
+        case "do you like tea?":
+          response = 'Tea is wonderful! There are so many different types of tea to enjoy.';
+          break;
+        case "how old is the universe?":
+          response = 'The universe is about 13.8 billion years old.';
+          break;
+        case "what is 100 divided by 5?":
+          response = '100 divided by 5 equals 20.';
+          break;
+        case "who was the first man on the moon?":
+          response = 'Neil Armstrong was the first man to walk on the Moon, in 1969.';
+          break;
+        case "who was the first woman in space?":
+          response = 'Valentina Tereshkova was the first woman in space, in 1963.';
+          break;
+        case "what is the capital of spain?":
+          response = 'The capital of Spain is Madrid.';
+          break;
+        case "what is the capital of india?":
+          response = 'The capital of India is New Delhi.';
+          break;
+        case "what is the capital of south korea?":
+          response = 'The capital of South Korea is Seoul.';
+          break;
+        case "what is the capital of mexico?":
+          response = 'The capital of Mexico is Mexico City.';
+          break;
+        case "what is the capital of egypt?":
+          response = 'The capital of Egypt is Cairo.';
+          break;
+        case "do you know any facts about the ocean?":
+          response = 'The ocean covers about 71% of Earth’s surface and contains 97% of Earth’s water.';
+          break;
+        case "what is the smallest planet in our solar system?":
+          response = 'Mercury is the smallest planet in our solar system.';
+          break;
+        case "what is the largest moon in our solar system?":
+          response = 'Ganymede, one of Jupiter’s moons, is the largest moon in our solar system.';
+          break;
+        case "what is the fastest land animal?":
+          response = 'The fastest land animal is the cheetah, which can run up to 75 mph.';
+          break;
+        case "what is the largest tree in the world?":
+          response = 'The General Sherman tree, a giant sequoia in California, is the largest tree by volume.';
+          break;
+        case "do you know any facts about space?":
+          response = 'Space is constantly expanding, and new stars and galaxies are being formed every day.';
           break;
         default:
-          response = "I'm sorry, I didn't understand that.";
+          response = "I didn't understand that. Please try again.";
+          break;
       }
 
-      chatArea.innerHTML += `<p><strong>BrunoBot:</strong> ${response}</p>`;
-      document.getElementById('userInput').value = '';
-    };
-
-    // Listen for Enter key
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('userInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-          handleUserInput();
-        }
-      });
-    });
+      return response;
+    }
   </script>
-</head>
-<body>
-  <div class="bot-container">
-    <h1>BrunoBot</h1>
-    <div id="chatArea" class="chat-area"></div>
-    <div class="input-area">
-      <input type="text" id="userInput" placeholder="Type your message here..." />
-      <button onclick="handleUserInput()">Send</button>
-    </div>
-    <button id="logoutBtn" onclick="logout()">Logout</button>
-  </div>
 </body>
 </html>
