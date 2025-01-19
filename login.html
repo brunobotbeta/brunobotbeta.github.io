@@ -3,29 +3,97 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login - BrunoBot</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .error-message {
+      color: red;
+      font-size: 14px;
+    }
+  </style>
 </head>
 <body>
-  <div id="login-container">
-    <h2>Login to BrunoBot</h2>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button id="login-btn">Login</button>
-    <a href="signup.html">Don't have an account? Sign up here.</a>
+
+  <div class="form-container">
+    <h2>Login</h2>
+    <form id="loginForm">
+      <input type="text" id="username" placeholder="Username" required><br>
+      <input type="password" id="password" placeholder="Password" required><br>
+      <button type="submit">Login</button>
+    </form>
+    <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
+    <p id="errorMessage" class="error-message"></p>
   </div>
 
   <script>
-    document.getElementById("login-btn").addEventListener("click", () => {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
+    document.getElementById("loginForm").addEventListener("submit", function(event) {
+      event.preventDefault();
 
-      // Manually verify credentials (Example: "Bruno" and "password123")
-      if (username === "Bruno" && password === "Bruno") {
-        localStorage.setItem("loggedInUser", username); // Store logged-in user
-        window.location.href = "index.html"; // Redirect to the main page
-      } else {
-        alert("Incorrect username or password.");
+      // Get the entered username and password
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
+
+      // Get stored users from localStorage
+      var users = JSON.parse(localStorage.getItem("users")) || [];
+
+      // Check if the entered username and password match an accepted user
+      var userFound = false;
+      for (var i = 0; i < users.length; i++) {
+        if (users[i].username === username && users[i].password === password) {
+          if (users[i].accepted) {
+            // If user is accepted, log them in and redirect
+            alert("Welcome, " + username + "!");
+            window.location.href = "index.html"; // Redirect to the bot (main page)
+            userFound = true;
+            break;
+          } else {
+            // If the user is not accepted yet
+            document.getElementById("errorMessage").textContent = "Your account is pending approval. Please wait.";
+            userFound = true;
+            break;
+          }
+        }
+      }
+
+      // If no matching user was found
+      if (!userFound) {
+        document.getElementById("errorMessage").textContent = "Incorrect username or password.";
       }
     });
   </script>
