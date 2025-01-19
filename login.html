@@ -3,164 +3,31 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login System with Admin Panel</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
-      background-color: #f4f4f9;
-    }
-    .container {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-      max-width: 400px;
-      width: 100%;
-    }
-    h2, h3 {
-      text-align: center;
-    }
-    label, input, button {
-      display: block;
-      width: 100%;
-      margin-bottom: 15px;
-    }
-    input {
-      padding: 10px;
-      border: 1px solid #ddd;
-      border-radius: 4px;
-    }
-    button {
-      background: #007bff;
-      color: white;
-      border: none;
-      padding: 10px;
-      border-radius: 4px;
-      cursor: pointer;
-    }
-    button:hover {
-      background: #0056b3;
-    }
-    .admin-panel {
-      display: none;
-    }
-    .signup-link {
-      text-align: center;
-      margin-top: 10px;
-    }
-    .signup-link a {
-      color: #007bff;
-      text-decoration: none;
-    }
-    .signup-link a:hover {
-      text-decoration: underline;
-    }
-    .admin-controls {
-      text-align: center;
-      margin-top: 15px;
-    }
-  </style>
+  <title>Login - BrunoBot</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-  <div class="container">
-    <h2 id="login-heading">Login</h2>
-
-    <!-- Login Form -->
-    <form id="login-form">
-      <label for="username">Username:</label>
-      <input type="text" id="username" required>
-      <label for="password">Password:</label>
-      <input type="password" id="password" required>
-      <button type="button" onclick="login()">Login</button>
-    </form>
-
-    <!-- Link to Signup -->
-    <div class="signup-link">
-      <p>Don't have an account? <a href="signup.html">Sign Up</a></p>
-    </div>
-
-    <!-- Admin Panel -->
-    <div id="admin-panel" class="admin-panel">
-      <h3>Admin Panel</h3>
-      <ul id="pending-users"></ul>
-      <div class="admin-controls">
-        <button onclick="goToBot()">Go to Bot</button>
-      </div>
-    </div>
+  <div id="login-container">
+    <h2>Login to BrunoBot</h2>
+    <input type="text" id="username" placeholder="Username" />
+    <input type="password" id="password" placeholder="Password" />
+    <button id="login-btn">Login</button>
+    <a href="signup.html">Don't have an account? Sign up here.</a>
   </div>
 
   <script>
-    // Mock storage for user data and pending sign-ups
-    const adminCredentials = { username: 'Bruno', password: 'admin123' };
-    const pendingUsers = JSON.parse(localStorage.getItem('pendingUsers')) || [];
-    const acceptedUsers = JSON.parse(localStorage.getItem('acceptedUsers')) || [];
+    document.getElementById("login-btn").addEventListener("click", () => {
+      const username = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
 
-    // Login function
-    function login() {
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-
-      if (username === adminCredentials.username && password === adminCredentials.password) {
-        showAdminPanel();
-      } else if (acceptedUsers.some(user => user.username === username && user.password === password)) {
-        alert('Welcome, ' + username + '!');
-        localStorage.setItem('loggedInUser', username); // Save logged-in user
-        window.location.href = 'index.html'; // Redirect to the bot
+      // Manually verify credentials (Example: "Bruno" and "password123")
+      if (username === "Bruno" && password === "password123") {
+        localStorage.setItem("loggedInUser", username); // Store logged-in user
+        window.location.href = "index.html"; // Redirect to the main page
       } else {
-        alert('Invalid credentials!');
+        alert("Incorrect username or password.");
       }
-    }
-
-    // Show Admin Panel
-    function showAdminPanel() {
-      document.getElementById('login-form').style.display = 'none';
-      document.getElementById('admin-panel').style.display = 'block';
-      document.getElementById('login-heading').textContent = 'Admin Panel';
-      renderPendingUsers();
-    }
-
-    // Render pending users
-    function renderPendingUsers() {
-      const pendingList = document.getElementById('pending-users');
-      pendingList.innerHTML = '';
-      pendingUsers.forEach((user, index) => {
-        const listItem = document.createElement('li');
-        listItem.innerHTML = `
-          ${user.username} (${user.email})
-          <button onclick="acceptUser(${index})">Accept</button>
-          <button onclick="declineUser(${index})">Decline</button>
-        `;
-        pendingList.appendChild(listItem);
-      });
-    }
-
-    // Accept user
-    function acceptUser(index) {
-      const user = pendingUsers.splice(index, 1)[0];
-      acceptedUsers.push(user);
-      localStorage.setItem('acceptedUsers', JSON.stringify(acceptedUsers));
-      localStorage.setItem('pendingUsers', JSON.stringify(pendingUsers));
-      alert(`${user.username} has been accepted!`);
-      renderPendingUsers();
-    }
-
-    // Decline user
-    function declineUser(index) {
-      const user = pendingUsers.splice(index, 1)[0];
-      localStorage.setItem('pendingUsers', JSON.stringify(pendingUsers));
-      alert(`${user.username} has been declined.`);
-      renderPendingUsers();
-    }
-
-    // Go to Bot
-    function goToBot() {
-      window.location.href = 'index.html';
-    }
+    });
   </script>
 </body>
 </html>
