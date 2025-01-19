@@ -1,239 +1,179 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BrunoBot</title>
-  <link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BrunoBot</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-image: url('https://londonmymind.com/wp-content/uploads/2022/01/Sunset-in-London-Hero-2-1024x683.jpg');
+            background-size: cover;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+        }
+        h1 {
+            text-align: center;
+            color: #FFCC00;
+        }
+        #chatbox {
+            max-height: 400px;
+            overflow-y: auto;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+        }
+        #userInput {
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            margin-top: 10px;
+            border: 2px solid #FFCC00;
+            color: #000;
+        }
+        .chat-message {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #333;
+            border-radius: 8px;
+        }
+        .user-message {
+            background-color: #FFCC00;
+            color: black;
+            text-align: left;
+        }
+        .bot-message {
+            background-color: #444;
+            color: white;
+            text-align: right;
+        }
+        .button {
+            background-color: #FFCC00;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin: 10px 0;
+            display: block;
+            width: 100%;
+        }
+        .button:hover {
+            background-color: #FF9900;
+        }
+        .message-box {
+            margin-bottom: 15px;
+        }
+    </style>
 </head>
 <body>
-  <div id="chat-container">
-    <div id="chat-box"></div>
-    <input type="text" id="user-input" placeholder="Type here..." />
-    <button id="logout-btn">Logout</button>
-  </div>
 
-  <script>
-    // Check if the user is logged in by checking localStorage
-    if (!localStorage.getItem("loggedInUser")) {
-      window.location.href = "login.html"; // Redirect if not logged in
-    }
+    <div class="container">
+        <h1>BrunoBot</h1>
+        <div id="chatbox">
+            <!-- Messages will appear here -->
+        </div>
+        <input type="text" id="userInput" placeholder="Type a command..." onkeydown="if(event.key === 'Enter'){ processInput(); }">
+        <button class="button" onclick="processInput()">Send</button>
+        <button class="button" onclick="logout()">Logout</button>
+    </div>
 
-    // Handle user input and commands
-    const inputField = document.getElementById("user-input");
-    const chatBox = document.getElementById("chat-box");
+    <script>
+        const commands = {
+            "hello": "Hello! How can I assist you today?",
+            "hi": "Hello! How can I assist you today?",
+            "what is my name": function() {
+                return `Your name is ${localStorage.getItem('name') || 'Bruno'}.`;
+            },
+            "time in london": function() {
+                return `The current time in London is ${new Date().toLocaleString("en-GB", { timeZone: "Europe/London" })}.`;
+            },
+            "weather in london": "The weather in London is currently sunny with 15°C.",
+            "what is brunle": "Brunle is a word guessing game where you try to guess a 5-letter word!",
+            "facts": "Did you know that honey never spoils? Archaeologists have found pots of honey in ancient tombs that are still good to eat!",
+            "name my city": function() {
+                return `Your favorite city is ${localStorage.getItem('city') || 'London'}.`;
+            },
+            "what is your name": "I am BrunoBot. Nice to meet you!",
+            "help": "You can ask me to tell you the time, weather, facts, play Brunle, and more! Type in a command and I’ll assist.",
+            "give me a random number": function() {
+                return `Here is a random number: ${Math.floor(Math.random() * 100) + 1}.`;
+            },
+            "tell me a joke": "Why don't skeletons fight each other? They don’t have the guts!",
+            "tell me about the eiffel tower": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+            "tell me a math fact": "Did you know? Pi (π) is an irrational number, which means its decimal representation never ends and never repeats!",
+            "what is the tallest mountain": "The tallest mountain on Earth is Mount Everest, standing at 8,848.86 meters (29,031.7 feet).",
+            "tell me about world war ii": "World War II was a global war that lasted from 1939 to 1945, involving most of the world's nations.",
+            "give me an inspirational quote": "“The only way to do great work is to love what you do.” – Steve Jobs",
+            "give me a recipe suggestion": "How about making a delicious Spaghetti Aglio e Olio? It’s simple: spaghetti, garlic, olive oil, red pepper flakes, and parsley.",
+            "what is the population of spain": "The current population of Spain is approximately 47 million.",
+            "who is nikola tesla": "Nikola Tesla was a Serbian-American inventor and electrical engineer known for his work in the development of alternating current (AC) electricity.",
+            "what is the capital of france": "The capital of France is Paris.",
+            "tell me about albert einstein": "Albert Einstein was a German-born theoretical physicist best known for developing the theory of relativity, one of the two pillars of modern physics.",
+            "give me a random word": function() {
+                const words = ['Serendipity', 'Euphoria', 'Bliss', 'Epiphany', 'Resilience'];
+                return `Here’s a random word: ${words[Math.floor(Math.random() * words.length)]}.`;
+            },
+            "what is the largest ocean": "The largest ocean is the Pacific Ocean, covering more than 63 million square miles (165 million square kilometers).",
+            "who is cleopatra": "Cleopatra was the last active ruler of the Ptolemaic Kingdom of Egypt, known for her political acumen and relationships with Julius Caesar and Mark Antony."
+        };
 
-    inputField.addEventListener("keydown", (event) => {
-      if (event.key === "Enter") {
-        let userInput = inputField.value.toLowerCase();
-        let response = handleUserCommands(userInput); // Calls the function to check commands
-        chatBox.innerHTML += `<p>User: ${userInput}</p>`;
-        chatBox.innerHTML += `<p>BrunoBot: ${response}</p>`;
-        inputField.value = ""; // Clear the input field
-      }
-    });
+        function processInput() {
+            const userInput = document.getElementById('userInput').value.toLowerCase();
+            document.getElementById('userInput').value = '';
+            const chatbox = document.getElementById('chatbox');
+            
+            if (userInput.trim() === '') return;
+            
+            let response = "I'm sorry, I didn't understand that.";
+            if (commands[userInput]) {
+                response = typeof commands[userInput] === 'function' ? commands[userInput]() : commands[userInput];
+            } else {
+                const commandFound = Object.keys(commands).find(key => userInput.includes(key));
+                if (commandFound) {
+                    response = typeof commands[commandFound] === 'function' ? commands[commandFound]() : commands[commandFound];
+                }
+            }
+            
+            const messageBox = document.createElement('div');
+            messageBox.classList.add('chat-message', 'user-message');
+            messageBox.textContent = userInput;
+            chatbox.appendChild(messageBox);
+            
+            const botMessageBox = document.createElement('div');
+            botMessageBox.classList.add('chat-message', 'bot-message');
+            botMessageBox.textContent = response;
+            chatbox.appendChild(botMessageBox);
+            
+            chatbox.scrollTop = chatbox.scrollHeight;
+        }
 
-    // Handle the logout button
-    document.getElementById("logout-btn").addEventListener("click", () => {
-      localStorage.removeItem("loggedInUser"); // Clear user from localStorage
-      window.location.href = "login.html"; // Redirect to login page
-    });
+        function logout() {
+            localStorage.clear();
+            window.location.href = "login.html";
+        }
 
-    // Command function handling
-    function handleUserCommands(userInput) {
-      let response = "";
+        // Make sure to load previous messages when a user logs in or when refreshing the page
+        if(localStorage.getItem('name')) {
+            const name = localStorage.getItem('name');
+            const welcomeMessage = `Welcome back, ${name}! How can I assist you today?`;
+            const welcomeBox = document.createElement('div');
+            welcomeBox.classList.add('chat-message', 'bot-message');
+            welcomeBox.textContent = welcomeMessage;
+            document.getElementById('chatbox').appendChild(welcomeBox);
+        }
 
-      switch (userInput) {
-        case "hello":
-        case "hi":
-          response = "Hello! How can I assist you today?";
-          break;
-        case "what is my name":
-          const userName = localStorage.getItem("userName");
-          response = userName ? `Your name is ${userName}!` : "I don't know your name yet.";
-          break;
-        case "weather in london":
-          response = "The weather in London is sunny with 15°C.";
-          break;
-        case "time in london":
-          const now = new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' });
-          response = `The current time in London is ${now}.`;
-          break;
-        case "tell me a joke":
-          response = 'Why don’t skeletons fight each other? They don’t have the guts!';
-          break;
-        case "how old are you?":
-          response = 'I am an AI, so I don’t age! But I’m always here to assist you.';
-          break;
-        case "who are you?":
-          response = 'I am BrunoBot, your friendly assistant!';
-          break;
-        case "do you like cats?":
-          response = 'I think cats are fascinating creatures!';
-          break;
-        case "do you like dogs?":
-          response = 'Dogs are amazing! I think they make great companions.';
-          break;
-        case "what is 2 + 2?":
-          response = '2 + 2 equals 4.';
-          break;
-        case "what is the square root of 16?":
-          response = 'The square root of 16 is 4.';
-          break;
-        case "what is the fastest animal on land?":
-          response = 'The fastest animal on land is the cheetah, reaching speeds up to 60 mph!';
-          break;
-        case "what is the largest country?":
-          response = 'Russia is the largest country in the world by land area.';
-          break;
-        case "how many continents are there?":
-          response = 'There are seven continents on Earth.';
-          break;
-        case "how many countries are there?":
-          response = 'There are 195 countries in the world.';
-          break;
-        case "what is the capital of france?":
-          response = 'The capital of France is Paris.';
-          break;
-        case "what is the capital of japan?":
-          response = 'The capital of Japan is Tokyo.';
-          break;
-        case "what is the fastest bird?":
-          response = 'The fastest bird is the peregrine falcon, which can dive at speeds over 200 mph.';
-          break;
-        case "what is the longest river?":
-          response = 'The longest river in the world is the Nile River.';
-          break;
-        case "what is the largest desert?":
-          response = 'The largest desert in the world is the Antarctic Desert.';
-          break;
-        case "what is the largest ocean?":
-          response = 'The Pacific Ocean is the largest ocean on Earth.';
-          break;
-        case "do you know any programming languages?":
-          response = 'Yes, I am familiar with languages like JavaScript, Python, and many others!';
-          break;
-        case "what is java?":
-          response = 'Java is a high-level programming language used for building applications.';
-          break;
-        case "what is python?":
-          response = 'Python is a high-level programming language used for web development, automation, and data analysis.';
-          break;
-        case "tell me about the internet":
-          response = 'The internet is a global network that connects millions of computers and devices worldwide.';
-          break;
-        case "how far is the moon from earth?":
-          response = 'The average distance from Earth to the Moon is about 384,400 km.';
-          break;
-        case "how many days are in a year?":
-          response = 'There are 365 days in a year, except in leap years when there are 366 days.';
-          break;
-        case "how many days in a leap year?":
-          response = 'There are 366 days in a leap year.';
-          break;
-        case "what is the largest planet in our solar system?":
-          response = 'Jupiter is the largest planet in our solar system.';
-          break;
-        case "what is the coldest planet?":
-          response = 'Uranus is the coldest planet in our solar system.';
-          break;
-        case "how much is 50 plus 30?":
-          response = '50 plus 30 equals 80.';
-          break;
-        case "who invented the telephone?":
-          response = 'Alexander Graham Bell is credited with inventing the telephone.';
-          break;
-        case "who invented the lightbulb?":
-          response = 'Thomas Edison is credited with inventing the practical lightbulb.';
-          break;
-        case "what is the capital of canada?":
-          response = 'The capital of Canada is Ottawa.';
-          break;
-        case "what is the capital of australia?":
-          response = 'The capital of Australia is Canberra.';
-          break;
-        case "what is the capital of germany?":
-          response = 'The capital of Germany is Berlin.';
-          break;
-        case "what is the capital of italy?":
-          response = 'The capital of Italy is Rome.';
-          break;
-        case "how many oceans are there?":
-          response = 'There are five oceans on Earth.';
-          break;
-        case "what is the fastest car in the world?":
-          response = 'The fastest car in the world is the Bugatti Chiron Super Sport 300+.';
-          break;
-        case "what is the biggest animal on Earth?":
-          response = 'The blue whale is the largest animal on Earth!';
-          break;
-        case "what is the tallest mountain?":
-          response = 'Mount Everest is the tallest mountain on Earth, standing at 8,848 meters.';
-          break;
-        case "tell me a fun fact":
-          response = 'Did you know octopuses have three hearts?';
-          break;
-        case "do you know any facts about space?":
-          response = 'Space is infinite and contains billions of galaxies, stars, and planets.';
-          break;
-        case "how do you work?":
-          response = 'I work by processing your input and providing helpful responses based on what I know.';
-          break;
-        case "do you like tea?":
-          response = 'Tea is wonderful! There are so many different types of tea to enjoy.';
-          break;
-        case "how old is the universe?":
-          response = 'The universe is about 13.8 billion years old.';
-          break;
-        case "what is 100 divided by 5?":
-          response = '100 divided by 5 equals 20.';
-          break;
-        case "who was the first man on the moon?":
-          response = 'Neil Armstrong was the first man to walk on the Moon, in 1969.';
-          break;
-        case "who was the first woman in space?":
-          response = 'Valentina Tereshkova was the first woman in space, in 1963.';
-          break;
-        case "what is the capital of spain?":
-          response = 'The capital of Spain is Madrid.';
-          break;
-        case "what is the capital of india?":
-          response = 'The capital of India is New Delhi.';
-          break;
-        case "what is the capital of south korea?":
-          response = 'The capital of South Korea is Seoul.';
-          break;
-        case "what is the capital of mexico?":
-          response = 'The capital of Mexico is Mexico City.';
-          break;
-        case "what is the capital of egypt?":
-          response = 'The capital of Egypt is Cairo.';
-          break;
-        case "do you know any facts about the ocean?":
-          response = 'The ocean covers about 71% of Earth’s surface and contains 97% of Earth’s water.';
-          break;
-        case "what is the smallest planet in our solar system?":
-          response = 'Mercury is the smallest planet in our solar system.';
-          break;
-        case "what is the largest moon in our solar system?":
-          response = 'Ganymede, one of Jupiter’s moons, is the largest moon in our solar system.';
-          break;
-        case "what is the fastest land animal?":
-          response = 'The fastest land animal is the cheetah, which can run up to 75 mph.';
-          break;
-        case "what is the largest tree in the world?":
-          response = 'The General Sherman tree, a giant sequoia in California, is the largest tree by volume.';
-          break;
-        case "do you know any facts about space?":
-          response = 'Space is constantly expanding, and new stars and galaxies are being formed every day.';
-          break;
-        default:
-          response = "I didn't understand that. Please try again.";
-          break;
-      }
+    </script>
 
-      return response;
-    }
-  </script>
 </body>
 </html>
