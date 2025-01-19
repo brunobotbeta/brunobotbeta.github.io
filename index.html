@@ -3,70 +3,164 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Location Check</title>
+    <title>BrunoBot</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            text-align: center;
-            background-color: #f8f9fa;
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            color: #333;
+            font-family: Arial, sans-serif;
+            background: url('https://londonmymind.com/wp-content/uploads/2022/01/Sunset-in-London-Hero-2-1024x683.jpg') no-repeat center center fixed;
+            background-size: cover;
+            color: white;
         }
-        .message-box {
-            padding: 20px;
-            border: 2px solid #ccc;
-            border-radius: 10px;
-            background: #fff;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+        #messages {
+            max-height: 400px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+            padding: 10px;
+            background-color: rgba(0, 0, 0, 0.5);
         }
-        h1 {
-            font-size: 24px;
-            margin-bottom: 10px;
+
+        #userInput {
+            width: 100%;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            background-color: rgba(255, 255, 255, 0.8);
         }
-        p {
-            font-size: 18px;
+
+        .message {
+            margin: 10px 0;
+        }
+
+        #brunoBot {
+            font-weight: bold;
         }
     </style>
 </head>
 <body>
-    <div class="message-box" id="message-box">
-        <h1>Checking Your Location...</h1>
-        <p id="message">Please wait while we verify your access.</p>
-    </div>
+    <div id="messages"></div>
+    <input type="text" id="userInput" placeholder="Ask me something..." />
 
     <script>
-        // Your IPStack API key
-        const apiKey = '78d84e11ef4653ba1d4031c10a2f7808';
+        // The JavaScript code I provided earlier
+        document.addEventListener("DOMContentLoaded", () => {
+            const messages = document.getElementById("messages");
+            const userInput = document.getElementById("userInput");
 
-        // Fetch location information from IPStack API
-        fetch(`http://api.ipstack.com/check?access_key=${apiKey}`)
-            .then(response => response.json())
-            .then(data => {
-                const country = data.country_name; // Get the user's country
-                if (country === "United Kingdom") {
-                    // Redirect to the Google Sites page if in the UK
-                    window.location.href = "https://sites.google.com/view/brunotools/brunobot";
-                } else {
-                    // Show a message if not in the UK
-                    document.getElementById("message-box").innerHTML = `
-                        <h1>Access Restricted</h1>
-                        <p>Sorry, this site is only available to users in the United Kingdom.</p>
-                        <p>Your location: ${country}</p>
-                    `;
+            userInput.addEventListener("keypress", function (e) {
+                if (e.key === "Enter") {
+                    processInput();
                 }
-            })
-            .catch(error => {
-                // Handle errors (e.g., API fails to load)
-                document.getElementById("message-box").innerHTML = `
-                    <h1>Error</h1>
-                    <p>Unable to determine your location. Please try again later.</p>
-                `;
-                console.error("Error fetching location:", error);
             });
+
+            function processInput() {
+                const input = userInput.value.trim().toLowerCase();
+                userInput.value = ""; // Clear input field
+                if (!input) return;
+
+                appendMessage("You", input);
+
+                // Greeting
+                if (input.includes("hello") || input.includes("hi")) {
+                    const name = localStorage.getItem("username");
+                    if (name) {
+                        appendMessage("BrunoBot", `Welcome back, ${name}! How can I assist you today?`);
+                    } else {
+                        appendMessage("BrunoBot", "Hello! What's your name?");
+                    }
+                }
+
+                // Save or Retrieve Name
+                else if (input.startsWith("my name is")) {
+                    const name = input.replace("my name is", "").trim();
+                    localStorage.setItem("username", name);
+                    appendMessage("BrunoBot", `Nice to meet you, ${name}! I'll remember your name.`);
+                } else if (input.includes("what is my name")) {
+                    const name = localStorage.getItem("username");
+                    if (name) {
+                        appendMessage("BrunoBot", `Your name is ${name}!`);
+                    } else {
+                        appendMessage("BrunoBot", "I don't know your name yet. What's your name?");
+                    }
+                }
+
+                // Save or Retrieve Favourite City
+                else if (input.includes("remember my city")) {
+                    const city = input.replace("remember my city", "").trim();
+                    localStorage.setItem("preferredCity", city);
+                    appendMessage("BrunoBot", `Got it! I'll always check the weather and time for ${city}.`);
+                } else if (input.includes("what is my city")) {
+                    const city = localStorage.getItem("preferredCity");
+                    if (city) {
+                        appendMessage("BrunoBot", `Your favourite city is ${city}.`);
+                    } else {
+                        appendMessage("BrunoBot", "I don't know your favourite city yet. What's your favourite city?");
+                    }
+                }
+
+                // Weather
+                else if (input.includes("weather")) {
+                    const city = extractLocation(input, "weather") || localStorage.getItem("preferredCity") || "London";
+                    getWeather(city);
+                }
+
+                // Time
+                else if (input.includes("time")) {
+                    const city = extractLocation(input, "time") || localStorage.getItem("preferredCity") || "London";
+                    getTime(city);
+                }
+
+                // Unrecognised Input
+                else {
+                    appendMessage("BrunoBot", "I don't understand. Could you rephrase?");
+                }
+            }
+
+            function appendMessage(sender, message) {
+                const newMessage = document.createElement("p");
+                newMessage.textContent = `${sender}: ${message}`;
+                messages.appendChild(newMessage);
+                messages.scrollTop = messages.scrollHeight; // Auto-scroll
+            }
+
+            function extractLocation(input, keyword) {
+                const words = input.split(" ");
+                const keywordIndex = words.indexOf(keyword);
+                if (keywordIndex >= 0 && keywordIndex < words.length - 1) {
+                    return words[keywordIndex + 1];
+                }
+                return null;
+            }
+
+            // Fetch Weather Data
+            function getWeather(city) {
+                const apiKey = "434ce40c5261c3ea43477f902ee0fd78"; // Your OpenWeather API key
+                fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.cod === 200) {
+                            appendMessage(
+                                "BrunoBot",
+                                `The weather in ${city} is ${data.weather[0].description} with a temperature of ${data.main.temp}°C.`
+                            );
+                        } else {
+                            appendMessage("BrunoBot", `I couldn't find the weather for ${city}. Please try another city.`);
+                        }
+                    })
+                    .catch(() => appendMessage("BrunoBot", "There was an error fetching the weather data."));
+            }
+
+            // Fetch Time Data
+            function getTime(city) {
+                fetch(`https://worldtimeapi.org/api/timezone/Europe/London`) // Example: Replace for dynamic city-to-timezone mapping
+                    .then(response => response.json())
+                    .then(data => {
+                        appendMessage("BrunoBot", `The current time in ${city} is ${data.datetime.split("T")[1].split(".")[0]}.`);
+                    })
+                    .catch(() => appendMessage("BrunoBot", "There was an error fetching the time data."));
+            }
+        });
     </script>
 </body>
 </html>
