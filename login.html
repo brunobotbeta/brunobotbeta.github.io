@@ -60,6 +60,10 @@
     .signup-link a:hover {
       text-decoration: underline;
     }
+    .admin-controls {
+      text-align: center;
+      margin-top: 15px;
+    }
   </style>
 </head>
 <body>
@@ -84,6 +88,9 @@
     <div id="admin-panel" class="admin-panel">
       <h3>Admin Panel</h3>
       <ul id="pending-users"></ul>
+      <div class="admin-controls">
+        <button onclick="goToBot()">Go to Bot</button>
+      </div>
     </div>
   </div>
 
@@ -102,6 +109,8 @@
         showAdminPanel();
       } else if (acceptedUsers.some(user => user.username === username && user.password === password)) {
         alert('Welcome, ' + username + '!');
+        localStorage.setItem('loggedInUser', username); // Save logged-in user
+        window.location.href = 'index.html'; // Redirect to the bot
       } else {
         alert('Invalid credentials!');
       }
@@ -146,6 +155,11 @@
       localStorage.setItem('pendingUsers', JSON.stringify(pendingUsers));
       alert(`${user.username} has been declined.`);
       renderPendingUsers();
+    }
+
+    // Go to Bot
+    function goToBot() {
+      window.location.href = 'index.html';
     }
   </script>
 </body>
