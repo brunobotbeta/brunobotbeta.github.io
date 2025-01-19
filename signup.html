@@ -3,30 +3,86 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sign Up - BrunoBot</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>Signup</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .form-container {
+      background-color: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      width: 300px;
+      text-align: center;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 5px 0;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      width: 100%;
+      margin-top: 10px;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+  </style>
 </head>
 <body>
-  <div id="signup-container">
-    <h2>Sign Up for BrunoBot</h2>
-    <input type="text" id="new-username" placeholder="Username" />
-    <input type="email" id="new-email" placeholder="Email" />
-    <input type="password" id="new-password" placeholder="Password" />
-    <button id="signup-btn">Sign Up</button>
-    <a href="login.html">Already have an account? Login here.</a>
+
+  <div class="form-container">
+    <h2>Sign Up</h2>
+    <form id="signupForm">
+      <input type="text" id="username" placeholder="Username" required><br>
+      <input type="email" id="email" placeholder="Email" required><br>
+      <input type="password" id="password" placeholder="Password" required><br>
+      <button type="submit">Sign Up</button>
+    </form>
   </div>
 
   <script>
-    document.getElementById("signup-btn").addEventListener("click", () => {
-      const username = document.getElementById("new-username").value;
-      const email = document.getElementById("new-email").value;
-      const password = document.getElementById("new-password").value;
+    document.getElementById('signupForm').addEventListener('submit', function(e) {
+      e.preventDefault();
 
-      // Save the sign-up info temporarily
-      localStorage.setItem("pendingUser", JSON.stringify({ username, email, password }));
-      alert("Your sign-up request has been sent. Please wait for admin approval.");
-      window.location.href = "login.html"; // Redirect to login after sign-up
+      // Get the values from the form
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      // Simulate saving the user data to a "waiting list" (localStorage for simplicity)
+      let users = JSON.parse(localStorage.getItem('waitingUsers')) || [];
+      
+      // Check if the username or email already exists
+      const userExists = users.some(user => user.username === username || user.email === email);
+      if (userExists) {
+        alert('Username or email already exists. Please try again with different credentials.');
+        return;
+      }
+
+      // Add new user to the waiting list
+      users.push({ username, email, password, status: 'pending' });
+      localStorage.setItem('waitingUsers', JSON.stringify(users));
+
+      // Redirect to admin panel (waiting for approval)
+      window.location.href = 'admin_panel.html'; 
     });
   </script>
+
 </body>
 </html>
