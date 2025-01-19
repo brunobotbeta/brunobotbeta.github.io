@@ -39,6 +39,13 @@
     button:hover {
       background-color: #45a049;
     }
+    .user-list {
+      margin-top: 20px;
+      text-align: left;
+    }
+    .user-list div {
+      margin: 10px 0;
+    }
   </style>
 </head>
 <body>
@@ -46,18 +53,63 @@
   <h1>Welcome to the Admin Panel</h1>
 
   <div class="admin-panel">
-    <h2>Manage Users</h2>
-    <p>Here you can manage users and their access.</p>
+    <h2>User Approval</h2>
+    <p>Approve or decline new users.</p>
 
-    <!-- Button to Teleport to the Bot -->
-    <button onclick="goToBot()">Teleport to BrunoBot</button>
+    <!-- List of pending users -->
+    <div class="user-list" id="userList">
+      <!-- Dynamically filled by JavaScript -->
+    </div>
+
+    <button onclick="goToBot()">Go to BrunoBot</button>
   </div>
 
   <script>
     // Function to redirect to the bot's page
     function goToBot() {
-      window.location.href = "index.html"; // Change to the actual bot's URL if necessary
+      window.location.href = 'index.html'; // Change to your bot's URL if necessary
     }
+
+    // Function to render the list of users
+    function renderUserList() {
+      let users = JSON.parse(localStorage.getItem('waitingUsers')) || [];
+
+      const userListDiv = document.getElementById('userList');
+      userListDiv.innerHTML = ''; // Clear the user list
+
+      users.forEach((user, index) => {
+        if (user.status === 'pending') {
+          userListDiv.innerHTML += `
+            <div>
+              <strong>${user.username}</strong> (Email: ${user.email}) 
+              <button onclick="approveUser(${index})">Approve</button>
+              <button onclick="declineUser(${index})">Decline</button>
+            </div>
+          `;
+        }
+      });
+    }
+
+    // Function to approve a user
+    function approveUser(index) {
+      let users = JSON.parse(localStorage.getItem('waitingUsers')) || [];
+      users[index].status = 'approved';
+      localStorage.setItem('waitingUsers', JSON.stringify(users));
+      alert('User approved!');
+      renderUserList(); // Re-render the user list
+    }
+
+    // Function to decline a user
+    function declineUser(index) {
+      let users = JSON.parse(localStorage.getItem('waitingUsers')) || [];
+      users.splice(index, 1); // Remove the user from the list
+      localStorage.setItem('waitingUsers', JSON.stringify(users));
+      alert('User declined!');
+      renderUserList(); // Re-render the user list
+    }
+
+    // Initial render of the user list
+    renderUserList();
   </script>
 
 </body>
