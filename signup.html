@@ -79,9 +79,9 @@
       users.push({ username, email, password, status: 'pending' });
       localStorage.setItem('waitingUsers', JSON.stringify(users));
 
-      // Redirect to admin panel (waiting for approval)
+      // Redirect to login page (waiting for approval)
       alert('Your account has been created, but it is waiting for admin approval.');
-      window.location.href = 'admin_panel.html'; 
+      window.location.href = 'login.html'; // Redirect to login page
     });
   </script>
 
