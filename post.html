@@ -6,11 +6,11 @@
     <title>Post - BrunoBot</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f9;
+            font-family: "Verdana", sans-serif;
+            background-color: #e0e0e0;
+            color: #333;
             margin: 0;
             padding: 0;
-            color: #333;
         }
         .container {
             width: 80%;
@@ -19,35 +19,37 @@
         }
         h1 {
             text-align: center;
-            color: #FF6600;
+            color: #3d8bfd;
+            font-size: 24px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #3d8bfd;
         }
         .post-form {
-            background-color: #fff;
+            background-color: #ffffff;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
             margin-bottom: 20px;
         }
-        input[type="text"], textarea {
+        input[type="text"], textarea, input[type="file"] {
             width: 100%;
             padding: 10px;
             margin: 10px 0;
             border-radius: 5px;
-            border: 1px solid #ddd;
-        }
-        input[type="file"] {
-            margin: 10px 0;
+            border: 1px solid #bbb;
+            font-size: 14px;
         }
         button {
-            background-color: #FF6600;
+            background-color: #3d8bfd;
             color: white;
-            border: none;
             padding: 10px 20px;
+            border: none;
             border-radius: 5px;
             cursor: pointer;
+            font-size: 14px;
         }
         button:hover {
-            background-color: #FF9933;
+            background-color: #3d73cc;
         }
         .posts {
             margin-top: 30px;
@@ -57,16 +59,27 @@
             padding: 15px;
             margin: 10px 0;
             border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+        }
+        .post-header {
+            font-weight: bold;
+            color: #3d8bfd;
         }
         .post img {
             max-width: 100%;
             height: auto;
             border-radius: 5px;
         }
-        .post-header {
-            font-weight: bold;
-            font-size: 1.2em;
+        .delete-button {
+            background-color: #ff6347;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        .delete-button:hover {
+            background-color: #ff4500;
         }
     </style>
 </head>
@@ -96,7 +109,9 @@
         function displayPosts() {
             const postsContainer = document.getElementById("postsContainer");
             postsContainer.innerHTML = "<h2>Recent Posts</h2>"; // Reset the container
-            posts.forEach(post => {
+            posts.reverse();  // Reverse the array so the newest posts are on top
+
+            posts.forEach((post, index) => {
                 const postElement = document.createElement("div");
                 postElement.classList.add("post");
 
@@ -115,8 +130,24 @@
                     postElement.appendChild(postImage);
                 }
 
+                // Create a delete button for each post
+                const deleteButton = document.createElement("button");
+                deleteButton.classList.add("delete-button");
+                deleteButton.textContent = "Delete Post";
+                deleteButton.onclick = function() {
+                    deletePost(index);
+                };
+                postElement.appendChild(deleteButton);
+
                 postsContainer.appendChild(postElement);
             });
+        }
+
+        // Function to delete a post
+        function deletePost(index) {
+            posts.splice(index, 1);  // Remove the post from the array
+            localStorage.setItem("posts", JSON.stringify(posts));  // Save the updated array in localStorage
+            displayPosts();  // Re-display the posts
         }
 
         // Handle post form submission
