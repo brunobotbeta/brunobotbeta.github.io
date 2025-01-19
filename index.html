@@ -9,158 +9,108 @@
             font-family: Arial, sans-serif;
             background: url('https://londonmymind.com/wp-content/uploads/2022/01/Sunset-in-London-Hero-2-1024x683.jpg') no-repeat center center fixed;
             background-size: cover;
-            color: white;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 0;
         }
 
-        #messages {
-            max-height: 400px;
-            overflow-y: scroll;
-            margin-bottom: 20px;
-            padding: 10px;
-            background-color: rgba(0, 0, 0, 0.5);
+        .container {
+            margin-top: 10%;
         }
 
-        #userInput {
-            width: 100%;
+        input, button {
             padding: 10px;
-            border: none;
-            border-radius: 5px;
             font-size: 16px;
-            background-color: rgba(255, 255, 255, 0.8);
+            margin: 5px;
+            border-radius: 5px;
         }
 
-        .message {
-            margin: 10px 0;
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
         }
 
-        #brunoBot {
-            font-weight: bold;
+        button:hover {
+            background-color: #45a049;
         }
     </style>
 </head>
 <body>
-    <div id="messages"></div>
-    <input type="text" id="userInput" placeholder="Ask me something..." />
+    <div class="container">
+        <h1 id="welcome"></h1>
+        <div>
+            <input type="text" id="input" placeholder="Ask me something...">
+            <button onclick="processInput()">Submit</button>
+        </div>
+        <p id="output"></p>
+        <button onclick="logout()">Logout</button>
+    </div>
 
     <script>
-        // The JavaScript code I provided earlier
-        document.addEventListener("DOMContentLoaded", () => {
-            const messages = document.getElementById("messages");
-            const userInput = document.getElementById("userInput");
+        // Mock User Data for Login Validation
+        const users = {
+            "bruno": "password123",
+            "admin": "adminpassword",
+            "user1": "user1password"
+        };
 
-            userInput.addEventListener("keypress", function (e) {
-                if (e.key === "Enter") {
-                    processInput();
-                }
-            });
+        // Check if User is Logged In
+        document.addEventListener('DOMContentLoaded', () => {
+            const loggedInUser = localStorage.getItem('loggedInUser');
 
-            function processInput() {
-                const input = userInput.value.trim().toLowerCase();
-                userInput.value = ""; // Clear input field
-                if (!input) return;
-
-                appendMessage("You", input);
-
-                // Greeting
-                if (input.includes("hello") || input.includes("hi")) {
-                    const name = localStorage.getItem("username");
-                    if (name) {
-                        appendMessage("BrunoBot", `Welcome back, ${name}! How can I assist you today?`);
-                    } else {
-                        appendMessage("BrunoBot", "Hello! What's your name?");
-                    }
-                }
-
-                // Save or Retrieve Name
-                else if (input.startsWith("my name is")) {
-                    const name = input.replace("my name is", "").trim();
-                    localStorage.setItem("username", name);
-                    appendMessage("BrunoBot", `Nice to meet you, ${name}! I'll remember your name.`);
-                } else if (input.includes("what is my name")) {
-                    const name = localStorage.getItem("username");
-                    if (name) {
-                        appendMessage("BrunoBot", `Your name is ${name}!`);
-                    } else {
-                        appendMessage("BrunoBot", "I don't know your name yet. What's your name?");
-                    }
-                }
-
-                // Save or Retrieve Favourite City
-                else if (input.includes("remember my city")) {
-                    const city = input.replace("remember my city", "").trim();
-                    localStorage.setItem("preferredCity", city);
-                    appendMessage("BrunoBot", `Got it! I'll always check the weather and time for ${city}.`);
-                } else if (input.includes("what is my city")) {
-                    const city = localStorage.getItem("preferredCity");
-                    if (city) {
-                        appendMessage("BrunoBot", `Your favourite city is ${city}.`);
-                    } else {
-                        appendMessage("BrunoBot", "I don't know your favourite city yet. What's your favourite city?");
-                    }
-                }
-
-                // Weather
-                else if (input.includes("weather")) {
-                    const city = extractLocation(input, "weather") || localStorage.getItem("preferredCity") || "London";
-                    getWeather(city);
-                }
-
-                // Time
-                else if (input.includes("time")) {
-                    const city = extractLocation(input, "time") || localStorage.getItem("preferredCity") || "London";
-                    getTime(city);
-                }
-
-                // Unrecognised Input
-                else {
-                    appendMessage("BrunoBot", "I don't understand. Could you rephrase?");
-                }
-            }
-
-            function appendMessage(sender, message) {
-                const newMessage = document.createElement("p");
-                newMessage.textContent = `${sender}: ${message}`;
-                messages.appendChild(newMessage);
-                messages.scrollTop = messages.scrollHeight; // Auto-scroll
-            }
-
-            function extractLocation(input, keyword) {
-                const words = input.split(" ");
-                const keywordIndex = words.indexOf(keyword);
-                if (keywordIndex >= 0 && keywordIndex < words.length - 1) {
-                    return words[keywordIndex + 1];
-                }
-                return null;
-            }
-
-            // Fetch Weather Data
-            function getWeather(city) {
-                const apiKey = "434ce40c5261c3ea43477f902ee0fd78"; // Your OpenWeather API key
-                fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${apiKey}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.cod === 200) {
-                            appendMessage(
-                                "BrunoBot",
-                                `The weather in ${city} is ${data.weather[0].description} with a temperature of ${data.main.temp}°C.`
-                            );
-                        } else {
-                            appendMessage("BrunoBot", `I couldn't find the weather for ${city}. Please try another city.`);
-                        }
-                    })
-                    .catch(() => appendMessage("BrunoBot", "There was an error fetching the weather data."));
-            }
-
-            // Fetch Time Data
-            function getTime(city) {
-                fetch(`https://worldtimeapi.org/api/timezone/Europe/London`) // Example: Replace for dynamic city-to-timezone mapping
-                    .then(response => response.json())
-                    .then(data => {
-                        appendMessage("BrunoBot", `The current time in ${city} is ${data.datetime.split("T")[1].split(".")[0]}.`);
-                    })
-                    .catch(() => appendMessage("BrunoBot", "There was an error fetching the time data."));
+            if (!loggedInUser) {
+                window.location.href = 'login.html'; // Redirect to login page if not logged in
+            } else {
+                document.getElementById('welcome').textContent = `Welcome, ${loggedInUser}! Ask me anything!`;
             }
         });
+
+        // Logout Functionality
+        function logout() {
+            localStorage.removeItem('loggedInUser');
+            window.location.href = 'login.html';
+        }
+
+        // Process User Input
+        function processInput() {
+            const input = document.getElementById('input').value.toLowerCase();
+            const output = document.getElementById('output');
+
+            // Sample responses for questions
+            const responses = {
+                "hello": "Hi there! How can I help you?",
+                "hi": "Hello! What's on your mind?",
+                "what's the time": () => `The current time is ${new Date().toLocaleTimeString()}.`,
+                "weather in london": () => fetchWeather("London"),
+                "play brunle": "Let's play Brunle! Guess the 5-letter word.",
+                "logout": () => logout(),
+                "what is 2+2": "It's 4!"
+            };
+
+            // Check for direct match or alternative words
+            if (responses[input]) {
+                const reply = responses[input];
+                output.textContent = typeof reply === 'function' ? reply() : reply;
+            } else {
+                output.textContent = "I didn't understand that. Please try again.";
+            }
+        }
+
+        // Fetch Weather Data
+        function fetchWeather(city) {
+            const apiKey = "434ce40c5261c3ea43477f902ee0fd78";
+            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`)
+                .then(response => response.json())
+                .then(data => {
+                    const tempCelsius = (data.main.temp - 273.15).toFixed(2);
+                    document.getElementById('output').textContent = `The weather in ${city} is ${tempCelsius}°C with ${data.weather[0].description}.`;
+                })
+                .catch(() => {
+                    document.getElementById('output').textContent = "Couldn't fetch the weather. Please try again.";
+                });
+        }
     </script>
 </body>
 </html>
