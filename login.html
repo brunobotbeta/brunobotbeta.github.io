@@ -1,112 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login</title>
-  <style>
-    /* Basic styling for the login page */
-    body {
-      font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .form-container {
-      background-color: white;
-      padding: 20px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-      width: 300px;
-      text-align: center;
-    }
-    input {
-      width: 100%;
-      padding: 10px;
-      margin: 5px 0;
-      border: 1px solid #ccc;
-      border-radius: 4px;
-    }
-    button {
-      padding: 10px;
-      background-color: #4CAF50;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 16px;
-      cursor: pointer;
-      width: 100%;
-      margin-top: 10px;
-    }
-    button:hover {
-      background-color: #45a049;
-    }
-    .error-message {
-      color: red;
-      font-size: 14px;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BrunoBot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-image: url('https://londonmymind.com/wp-content/uploads/2022/01/Sunset-in-London-Hero-2-1024x683.jpg');
+            background-size: cover;
+            color: white;
+            margin: 0;
+            padding: 0;
+        }
+        .login-container {
+            max-width: 400px;
+            margin: 100px auto;
+            padding: 20px;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 8px;
+            text-align: center;
+        }
+        h1 {
+            color: #FFCC00;
+        }
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 2px solid #FFCC00;
+            color: #000;
+        }
+        .button {
+            background-color: #FFCC00;
+            color: black;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .button:hover {
+            background-color: #FF9900;
+        }
+    </style>
 </head>
 <body>
 
-  <div class="form-container">
-    <h2>Login</h2>
-    <form id="loginForm">
-      <input type="text" id="username" placeholder="Username" required><br>
-      <input type="password" id="password" placeholder="Password" required><br>
-      <button type="submit">Login</button>
-    </form>
-    <p>Don't have an account? <a href="signup.html">Sign up here</a></p>
-    <p id="errorMessage" class="error-message"></p>
-  </div>
+    <div class="login-container">
+        <h1>BrunoBot Login</h1>
+        <form id="loginForm">
+            <input type="text" id="username" placeholder="Username" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <button type="submit" class="button">Login</button>
+        </form>
+        <p id="error-message" style="color: red;"></p>
+    </div>
 
-  <script>
-    // Initialize the users data (you can manually add the Bruno user here)
-    const defaultUsers = [
-      { username: "Bruno", password: "Bruno", accepted: true } // Bruno is already accepted
-    ];
+    <script>
+        // Predefined users
+        const users = {
+            "Bruno": "Bruno123",
+            "Alice": "Alice123",
+            "Bob": "Bob123"
+        };
 
-    // Store the users in localStorage
-    if (!localStorage.getItem("users")) {
-      localStorage.setItem("users", JSON.stringify(defaultUsers));
-    }
+        // Handle the login form submission
+        document.getElementById("loginForm").addEventListener("submit", function(event) {
+            event.preventDefault();
 
-    document.getElementById("loginForm").addEventListener("submit", function(event) {
-      event.preventDefault();
+            const username = document.getElementById("username").value;
+            const password = document.getElementById("password").value;
 
-      // Get the entered username and password
-      var username = document.getElementById("username").value;
-      var password = document.getElementById("password").value;
+            // Check if the username and password match any of the predefined users
+            if (users[username] && users[username] === password) {
+                // If valid, store the username and redirect to the main page
+                localStorage.setItem("username", username);
+                window.location.href = "index.html"; // Redirect to index.html
+            } else {
+                // If not valid, display an error message
+                document.getElementById("error-message").textContent = "Incorrect username or password.";
+            }
+        });
+    </script>
 
-      // Get stored users from localStorage
-      var users = JSON.parse(localStorage.getItem("users")) || [];
-
-      // Check if the entered username and password match an accepted user
-      var userFound = false;
-      for (var i = 0; i < users.length; i++) {
-        if (users[i].username === username && users[i].password === password) {
-          if (users[i].accepted) {
-            // If user is accepted, log them in and redirect
-            alert("Welcome, " + username + "!");
-            window.location.href = "index.html"; // Redirect to the bot (main page)
-            userFound = true;
-            break;
-          } else {
-            // If the user is not accepted yet
-            document.getElementById("errorMessage").textContent = "Your account is pending approval. Please wait.";
-            userFound = true;
-            break;
-          }
-        }
-      }
-
-      // If no matching user was found
-      if (!userFound) {
-        document.getElementById("errorMessage").textContent = "Incorrect username or password.";
-      }
-    });
-  </script>
 </body>
 </html>
