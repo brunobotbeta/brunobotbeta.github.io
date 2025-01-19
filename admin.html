@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background-color: #f4f4f4;
+    }
+    h1 {
+      text-align: center;
+    }
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      width: 300px;
+      padding: 20px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+    input {
+      margin-bottom: 10px;
+      padding: 10px;
+      font-size: 16px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+    }
+    button {
+      padding: 10px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    .error {
+      color: red;
+      font-size: 14px;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Admin Panel Login</h1>
+
+  <!-- Login Form -->
+  <div class="login-form">
+    <input type="text" id="username" placeholder="Enter Username">
+    <input type="password" id="password" placeholder="Enter Password">
+    <button onclick="login()">Login</button>
+    <p class="error" id="error-message"></p>
+  </div>
+
+  <script>
+    // Manual username and password for admin login
+    const correctUsername = "bruno"; // Set your username here
+    const correctPassword = "bruno"; // Set your password here
+
+    function login() {
+      var username = document.getElementById("username").value;
+      var password = document.getElementById("password").value;
+      var errorMessage = document.getElementById("error-message");
+
+      if (username === correctUsername && password === correctPassword) {
+        // If credentials are correct, redirect to admin panel
+        window.location.href = "admin_panel.html"; // Replace with the actual URL of your admin panel
+      } else {
+        // If credentials are incorrect, show error message
+        errorMessage.textContent = "Invalid username or password. Please try again.";
+      }
+    }
+  </script>
+
+</body>
+</html>
