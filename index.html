@@ -69,6 +69,18 @@
     button:hover {
       background-color: #0056b3;
     }
+
+    #logoutBtn {
+      background-color: red;
+      color: white;
+      margin-top: 10px;
+      padding: 5px 15px;
+      border-radius: 5px;
+    }
+
+    #logoutBtn:hover {
+      background-color: darkred;
+    }
   </style>
   <script>
     // Check for logged-in user, if not, redirect to login.html
@@ -77,6 +89,12 @@
       alert('You must log in to access this page!');
       window.location.href = 'login.html'; // Redirect if not logged in
     }
+
+    // Logout functionality
+    const logout = () => {
+      localStorage.removeItem('loggedInUser');
+      window.location.href = 'login.html'; // Redirect to login page after logout
+    };
 
     // Handle user input and respond
     const handleUserInput = () => {
@@ -115,6 +133,13 @@
           const favCity = localStorage.getItem('favCity');
           response = favCity ? `Your favorite city is ${favCity}!` : "I don't know your favorite city yet.";
           break;
+        case 'what is your name':
+          response = "I am BrunoBot. Nice to meet you!";
+          break;
+        case 'help':
+        case 'what can i do here?':
+          response = 'You can ask me to tell you the time, weather, facts, play Brunle, and more! Type in a command and I’ll assist.';
+          break;
         default:
           response = "I'm sorry, I didn't understand that.";
       }
@@ -141,6 +166,7 @@
       <input type="text" id="userInput" placeholder="Type your message here..." />
       <button onclick="handleUserInput()">Send</button>
     </div>
+    <button id="logoutBtn" onclick="logout()">Logout</button>
   </div>
 </body>
 </html>
