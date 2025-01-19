@@ -70,13 +70,14 @@
       window.location.href = 'index.html'; // Change to your bot's URL if necessary
     }
 
-    // Function to render the list of users
+    // Function to render the list of users from localStorage
     function renderUserList() {
       let users = JSON.parse(localStorage.getItem('waitingUsers')) || [];
 
       const userListDiv = document.getElementById('userList');
       userListDiv.innerHTML = ''; // Clear the user list
 
+      // Iterate over the users and display those that are pending approval
       users.forEach((user, index) => {
         if (user.status === 'pending') {
           userListDiv.innerHTML += `
@@ -93,19 +94,19 @@
     // Function to approve a user
     function approveUser(index) {
       let users = JSON.parse(localStorage.getItem('waitingUsers')) || [];
-      users[index].status = 'approved';
+      users[index].status = 'approved'; // Change status to 'approved'
       localStorage.setItem('waitingUsers', JSON.stringify(users));
       alert('User approved!');
-      renderUserList(); // Re-render the user list
+      renderUserList(); // Re-render the list
     }
 
     // Function to decline a user
     function declineUser(index) {
       let users = JSON.parse(localStorage.getItem('waitingUsers')) || [];
-      users.splice(index, 1); // Remove the user from the list
+      users.splice(index, 1); // Remove user from the list
       localStorage.setItem('waitingUsers', JSON.stringify(users));
       alert('User declined!');
-      renderUserList(); // Re-render the user list
+      renderUserList(); // Re-render the list
     }
 
     // Initial render of the user list
