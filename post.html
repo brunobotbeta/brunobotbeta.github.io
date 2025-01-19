@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Post - BrunoBot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            width: 80%;
+            margin: 0 auto;
+            padding-top: 20px;
+        }
+        h1 {
+            text-align: center;
+            color: #FF6600;
+        }
+        .post-form {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        input[type="file"] {
+            margin: 10px 0;
+        }
+        button {
+            background-color: #FF6600;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #FF9933;
+        }
+        .posts {
+            margin-top: 30px;
+        }
+        .post {
+            background-color: #fff;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        .post img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 5px;
+        }
+        .post-header {
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Post Something</h1>
+        <div class="post-form">
+            <form id="postForm">
+                <input type="text" id="username" placeholder="Enter your name" required>
+                <textarea id="postText" placeholder="What's on your mind?" rows="5" required></textarea>
+                <input type="file" id="postImage" accept="image/*">
+                <button type="submit">Post</button>
+            </form>
+        </div>
+
+        <div class="posts" id="postsContainer">
+            <h2>Recent Posts</h2>
+        </div>
+    </div>
+
+    <script>
+        // Check for existing posts in localStorage
+        let posts = JSON.parse(localStorage.getItem("posts")) || [];
+
+        // Function to display posts
+        function displayPosts() {
+            const postsContainer = document.getElementById("postsContainer");
+            postsContainer.innerHTML = "<h2>Recent Posts</h2>"; // Reset the container
+            posts.forEach(post => {
+                const postElement = document.createElement("div");
+                postElement.classList.add("post");
+
+                const postHeader = document.createElement("div");
+                postHeader.classList.add("post-header");
+                postHeader.textContent = `${post.username} said:`;
+                postElement.appendChild(postHeader);
+
+                const postText = document.createElement("p");
+                postText.textContent = post.text;
+                postElement.appendChild(postText);
+
+                if (post.image) {
+                    const postImage = document.createElement("img");
+                    postImage.src = post.image;
+                    postElement.appendChild(postImage);
+                }
+
+                postsContainer.appendChild(postElement);
+            });
+        }
+
+        // Handle post form submission
+        document.getElementById("postForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            const username = document.getElementById("username").value;
+            const postText = document.getElementById("postText").value;
+            const postImage = document.getElementById("postImage").files[0];
+
+            let imageURL = null;
+            if (postImage) {
+                // Create a URL for the uploaded image
+                imageURL = URL.createObjectURL(postImage);
+            }
+
+            // Create a new post object
+            const newPost = {
+                username,
+                text: postText,
+                image: imageURL
+            };
+
+            // Add the new post to the posts array
+            posts.push(newPost);
+
+            // Save the posts array in localStorage
+            localStorage.setItem("posts", JSON.stringify(posts));
+
+            // Reset the form
+            document.getElementById("postForm").reset();
+
+            // Re-display the posts
+            displayPosts();
+        });
+
+        // Display existing posts on page load
+        displayPosts();
+    </script>
+
+</body>
+</html>
