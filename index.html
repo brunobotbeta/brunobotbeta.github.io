@@ -1,152 +1,148 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrunoBot</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background: url('https://londonmymind.com/wp-content/uploads/2022/01/Sunset-in-London-Hero-2-1024x683.jpg') no-repeat center center fixed;
-            background-size: cover;
-            color: #fff;
-            text-align: center;
-            margin: 0;
-            padding: 0;
-        }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrunoBot</title>
+  <style>
+    /* General styles for the bot interface */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      background: url('https://londonmymind.com/wp-content/uploads/2022/01/Sunset-in-London-Hero-2-1024x683.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+    }
 
-        .container {
-            margin-top: 10%;
-        }
+    .bot-container {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 10px;
+      padding: 20px;
+      margin-top: 20px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      text-align: center;
+    }
 
-        input, button {
-            padding: 10px;
-            font-size: 16px;
-            margin: 5px;
-            border-radius: 5px;
-        }
+    h1 {
+      color: #007bff;
+      font-size: 2rem;
+      margin: 20px 0;
+    }
 
-        button {
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-        }
+    .chat-area {
+      background: #f4f4f9;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      height: 300px;
+      overflow-y: auto;
+      padding: 10px;
+      margin-bottom: 15px;
+    }
 
-        button:hover {
-            background-color: #45a049;
+    .input-area {
+      display: flex;
+      gap: 10px;
+    }
+
+    input {
+      flex-grow: 1;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    button {
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+  <script>
+    // Check for logged-in user, if not, redirect to login.html
+    const loggedInUser = localStorage.getItem('loggedInUser');
+    if (!loggedInUser) {
+      alert('You must log in to access this page!');
+      window.location.href = 'login.html'; // Redirect if not logged in
+    }
+
+    // Handle user input and respond
+    const handleUserInput = () => {
+      const userInput = document.getElementById('userInput').value.trim().toLowerCase();
+      const chatArea = document.getElementById('chatArea');
+
+      if (userInput === '') {
+        chatArea.innerHTML += `<p><strong>BrunoBot:</strong> Please say something!</p>`;
+        return;
+      }
+
+      let response = '';
+      switch (userInput) {
+        case 'hello':
+        case 'hi':
+          response = 'Hello! How can I assist you today?';
+          break;
+        case 'what is my name':
+          const storedName = localStorage.getItem('userName');
+          response = storedName ? `Your name is ${storedName}!` : "I don't know your name yet.";
+          break;
+        case 'time in london':
+          const now = new Date().toLocaleString('en-GB', { timeZone: 'Europe/London' });
+          response = `The current time in London is ${now}.`;
+          break;
+        case 'weather in london':
+          // Weather functionality will use OpenWeather API or can be hardcoded
+          response = "The weather in London is currently sunny with 15°C.";
+          break;
+        case 'what is brunle':
+          response = 'Brunle is a word guessing game where you try to guess a 5-letter word!';
+          break;
+        case 'facts':
+          response = 'Did you know that honey never spoils? Archaeologists have found pots of honey in ancient tombs that are still good to eat!';
+          break;
+        case 'name my city':
+          const favCity = localStorage.getItem('favCity');
+          response = favCity ? `Your favorite city is ${favCity}!` : "I don't know your favorite city yet.";
+          break;
+        default:
+          response = "I'm sorry, I didn't understand that.";
+      }
+
+      chatArea.innerHTML += `<p><strong>BrunoBot:</strong> ${response}</p>`;
+      document.getElementById('userInput').value = '';
+    };
+
+    // Listen for Enter key
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('userInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+          handleUserInput();
         }
-    </style>
+      });
+    });
+  </script>
 </head>
 <body>
-    <div class="container">
-        <h1 id="welcome"></h1>
-        <div>
-            <input type="text" id="input" placeholder="Ask me something...">
-            <button onclick="processInput()">Submit</button>
-        </div>
-        <p id="output"></p>
-        <button onclick="logout()">Logout</button>
+  <div class="bot-container">
+    <h1>BrunoBot</h1>
+    <div id="chatArea" class="chat-area"></div>
+    <div class="input-area">
+      <input type="text" id="userInput" placeholder="Type your message here..." />
+      <button onclick="handleUserInput()">Send</button>
     </div>
-
-    <script>
-        // User Session Management
-        const loggedInUser = localStorage.getItem('loggedInUser');
-        let userName = localStorage.getItem('userName') || loggedInUser || 'Guest';
-        let favoriteCity = localStorage.getItem('favoriteCity') || null;
-
-        // Set Welcome Message
-        document.addEventListener('DOMContentLoaded', () => {
-            if (!loggedInUser) {
-                window.location.href = 'login.html'; // Redirect if not logged in
-            } else {
-                document.getElementById('welcome').textContent = `Welcome, ${userName}! Ask me anything!`;
-            }
-        });
-
-        // Logout Functionality
-        function logout() {
-            localStorage.removeItem('loggedInUser');
-            localStorage.removeItem('userName');
-            localStorage.removeItem('favoriteCity');
-            window.location.href = 'login.html';
-        }
-
-        // Process User Input
-        function processInput() {
-            const input = document.getElementById('input').value.toLowerCase();
-            const output = document.getElementById('output');
-
-            // Map of Responses
-            const responses = {
-                "hello": "Hi there! How can I help you?",
-                "hi": "Hello! What's on your mind?",
-                "what's the time in london": () => fetchTime("Europe/London"),
-                "what's the weather in london": () => fetchWeather("London"),
-                "what is my name": () => `Your name is ${userName}.`,
-                "set my name to": (query) => {
-                    const name = query.replace("set my name to ", "").trim();
-                    userName = name.charAt(0).toUpperCase() + name.slice(1);
-                    localStorage.setItem('userName', userName);
-                    return `Nice to meet you, ${userName}!`;
-                },
-                "what's my favorite city": () => {
-                    if (favoriteCity) {
-                        return `Your favorite city is ${favoriteCity}.`;
-                    } else {
-                        return "I don't know your favorite city yet.";
-                    }
-                },
-                "set my favorite city to": (query) => {
-                    const city = query.replace("set my favorite city to ", "").trim();
-                    favoriteCity = city.charAt(0).toUpperCase() + city.slice(1);
-                    localStorage.setItem('favoriteCity', favoriteCity);
-                    return `${favoriteCity} is now your favorite city!`;
-                },
-                "play brunle": "Let's play Brunle! Guess the 5-letter word.",
-                "what is 2+2": "It's 4!"
-            };
-
-            // Process User Input
-            const matchedResponse = Object.keys(responses).find((key) =>
-                input.startsWith(key)
-            );
-
-            if (matchedResponse) {
-                const reply = responses[matchedResponse];
-                if (typeof reply === "function") {
-                    output.textContent = reply(input);
-                } else {
-                    output.textContent = reply;
-                }
-            } else {
-                output.textContent = "I didn't understand that. Please try again.";
-            }
-        }
-
-        // Fetch Time Data
-        function fetchTime(timezone) {
-            const output = document.getElementById('output');
-            try {
-                const now = new Date().toLocaleString("en-GB", { timeZone: timezone });
-                output.textContent = `The current time in ${timezone} is ${now}.`;
-            } catch (err) {
-                output.textContent = "I couldn't fetch the time. Please try again.";
-            }
-        }
-
-        // Fetch Weather Data
-        function fetchWeather(city) {
-            const apiKey = "434ce40c5261c3ea43477f902ee0fd78";
-            fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}`)
-                .then((response) => response.json())
-                .then((data) => {
-                    const tempCelsius = (data.main.temp - 273.15).toFixed(2);
-                    document.getElementById('output').textContent = `The weather in ${city} is ${tempCelsius}°C with ${data.weather[0].description}.`;
-                })
-                .catch(() => {
-                    document.getElementById('output').textContent = `I couldn't find the weather for ${city}. Please try another city.`;
-                });
-        }
-    </script>
+  </div>
 </body>
 </html>
