@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - BrunoBot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: url('https://londonmymind.com/wp-content/uploads/2022/01/Sunset-in-London-Hero-2-1024x683.jpg') no-repeat center center fixed;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .login-container {
+            background: rgba(255, 255, 255, 0.9);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            width: 300px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <h1>Login</h1>
+        <input type="text" id="username" placeholder="Username" required>
+        <input type="password" id="password" placeholder="Password" required>
+        <button onclick="login()">Login</button>
+        <p id="error" style="color: red; display: none;">Invalid username or password</p>
+    </div>
+
+    <script>
+        const users = {
+            "bruno": "password123",
+            "admin": "adminpassword",
+            "user1": "user1password"
+        };
+
+        function login() {
+            const username = document.getElementById('username').value.trim();
+            const password = document.getElementById('password').value.trim();
+            const error = document.getElementById('error');
+
+            if (users[username] && users[username] === password) {
+                localStorage.setItem('loggedInUser', username);
+                error.style.display = 'none';
+                window.location.href = 'index.html';
+            } else {
+                error.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
