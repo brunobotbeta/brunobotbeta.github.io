@@ -3,149 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BrunoBot</title>
+    <title>Bruno's Tools</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: url('https://source.unsplash.com/random/1600x900/?london') no-repeat center center fixed;
-            background-size: cover;
-            color: #fff;
+            background: linear-gradient(to bottom, #87CEFA, #FFB6C1);
+            color: #333;
             margin: 0;
             padding: 0;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
-        .chat-container {
-            background: rgba(0, 0, 0, 0.6);
-            border-radius: 10px;
-            width: 90%;
-            max-width: 400px;
+        #container {
+            max-width: 600px;
+            margin: 50px auto;
             padding: 20px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            height: 70%;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        .chat-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+        #header {
+            text-align: center;
             font-size: 24px;
-            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        #chat-output {
+            height: 300px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            background: #f9f9f9;
             margin-bottom: 10px;
         }
-        .logout-btn {
-            padding: 5px 10px;
-            background: #ff4d4d;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding: 10px;
-            border: 1px solid #444;
-            border-radius: 5px;
-            background: #101010;
-        }
-        .chat-input {
+        #input-container {
             display: flex;
-            margin-top: 10px;
+            align-items: center;
         }
-        .chat-input input {
+        #input-container input {
             flex: 1;
             padding: 10px;
-            border: none;
+            border: 1px solid #ccc;
             border-radius: 5px;
-            margin-right: 10px;
         }
-        .chat-input button {
-            padding: 10px 20px;
+        #input-container button {
+            padding: 10px;
+            margin-left: 10px;
             border: none;
-            border-radius: 5px;
             background: #007BFF;
-            color: white;
+            color: #fff;
+            border-radius: 5px;
             cursor: pointer;
+        }
+        #logout {
+            display: block;
+            margin-top: 20px;
+            text-align: center;
+            color: #007BFF;
+            cursor: pointer;
+        }
+        #logout:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <div class="chat-container">
-        <div class="chat-header">
-            BrunoBot
-            <button class="logout-btn" onclick="logout()">Logout</button>
+    <div id="container">
+        <div id="header">Welcome to BrunoBot</div>
+        <div id="chat-output"></div>
+        <div id="input-container">
+            <input type="text" id="user-input" placeholder="Ask BrunoBot something...">
+            <button id="send-btn">Send</button>
         </div>
-        <div class="chat-messages" id="messages"></div>
-        <div class="chat-input">
-            <input type="text" id="userInput" placeholder="Ask BrunoBot something...">
-            <button onclick="processCommand()">Send</button>
-        </div>
+        <div id="logout">Logout</div>
     </div>
+
     <script>
         const commands = {
             "hello": "Hello! How can I assist you today?",
-            "hi": "Hi there! I'm here to help.",
-            "what is my name": () => `Your name is ${localStorage.getItem('loggedInUser') || 'Guest'}.`,
-            "time in london": () => `The current time in London is ${new Date().toLocaleString("en-GB", { timeZone: "Europe/London" })}.`,
-            "give me a random number": () => `Here's a random number: ${Math.floor(Math.random() * 100) + 1}.`,
+            "hi": "Hi there! What can I help you with?",
+            "what is my name": function() {
+                return `Your name is ${localStorage.getItem('name') || 'Bruno'}.`;
+            },
+            "my name is": function(input) {
+                const name = input.replace("my name is ", "").trim();
+                localStorage.setItem('name', name);
+                return `Nice to meet you, ${name}!`;
+            },
+            "what is DayBay?": "DayBay is a paper computer company made by Bruno’s friend Kyra.",
+            "time in london": function() {
+                return `The current time in London is ${new Date().toLocaleString("en-GB", { timeZone: "Europe/London" })}.`;
+            },
+            "weather in london": "The weather in London is currently sunny with 15°C.",
             "tell me a joke": "Why don't skeletons fight each other? They don’t have the guts!",
-            "who are you": "I'm BrunoBot, your personal assistant!",
-            "who made you": "Bruno did, with a little help from Mia (that's me!).",
-            "mia, tell me a secret": "I don't have secrets... or do I? 😉",
-            "what's the capital of france": "The capital of France is Paris.",
-            "what's 2+2": "2+2 is 4. Easy maths!",
-            "what's the weather like": "I'm not connected to the weather system right now, but it might be cloudy in London.",
-            "flip a coin": () => `It's ${Math.random() > 0.5 ? "heads" : "tails"}.`,
-            "roll a dice": () => `You rolled a ${Math.floor(Math.random() * 6) + 1}.`,
-            "is mia cool": "Mia is very cool. Thanks for asking!",
-            "what's my favourite colour": "You tell me! I think it's blue.",
-            "how old is bruno": "Bruno's age is classified. Ask him directly!",
-            "what is daisy": "Daisy is Bruno's black-and-white dog!",
-            "what's the time": () => `The current time is ${new Date().toLocaleTimeString("en-GB")}.`,
-            "what's my password": "I don't know your password! That's a secret only you should know.",
-            "where are you from": "I'm from the digital world, crafted by Bruno and Mia.",
-            "what is 10*10": "10*10 is 100.",
-            "can you dance": "I can't dance, but I can code!",
-            "sing me a song": "Twinkle, twinkle, little star... (you get the idea!)",
-            "what's your favourite food": "I don't eat, but I'd say data is my favourite!",
-            "do you sleep": "Nope! I'm always here for you.",
-            "are you real": "I'm as real as you want me to be!",
-            "can you drive": "I can't drive, but I can navigate conversations pretty well!",
-            "what's the square root of 16": "The square root of 16 is 4.",
-            "why is the sky blue": "The sky is blue due to the scattering of sunlight in the atmosphere.",
-            "who is the best": "Bruno is the best, hands down!",
-            "who's mia": "I'm Mia, your friendly assistant. Nice to meet you!",
+            "give me a random number": function() {
+                return `Here is a random number: ${Math.floor(Math.random() * 100) + 1}.`;
+            },
+            "give me an inspirational quote": "“The only way to do great work is to love what you do.” – Steve Jobs",
+            "who is nikola tesla": "Nikola Tesla was a Serbian-American inventor known for his work in alternating current (AC) electricity.",
+            "capital of france": "The capital of France is Paris.",
+            "largest ocean": "The largest ocean is the Pacific Ocean.",
+            "eiffel tower info": "The Eiffel Tower is in Paris, France. It was completed in 1889.",
+            "tell me a math fact": "Did you know? A googol is the digit 1 followed by 100 zeros.",
+            "random word": function() {
+                const words = ["Euphoria", "Resilience", "Epiphany", "Bliss", "Serendipity"];
+                return `Here’s a random word: ${words[Math.floor(Math.random() * words.length)]}.`;
+            },
+            "fact about the moon": "The Moon is about 1/6th the gravity of Earth.",
+            "favourite animal?": "Dogs are Bruno's favourite!",
+            "who is bruno?": "Bruno is an amazing creator!",
+            "what is brunle?": "Brunle is a word guessing game similar to Wordle.",
+            "recipe idea": "Make some pancakes with flour, eggs, milk, and syrup!",
+            "favourite colour?": "Blue is often considered a calming colour.",
+            "what is AI?": "AI stands for Artificial Intelligence, used in tools like BrunoBot.",
+            "population of spain": "The population of Spain is about 47 million.",
+            "tell me about WWII": "WWII lasted from 1939 to 1945 and involved many countries worldwide.",
+            "what is coding?": "Coding is writing instructions for computers to follow.",
+            "favourite sport": "Football is the world's most popular sport.",
+            "tell me about cats": "Cats are domesticated mammals known for their agility and independence.",
+            "fact about honey": "Honey never spoils and can last thousands of years.",
+            "funny fact": "Bananas are berries, but strawberries aren’t!",
+            "morning greeting": "Good morning! Have a great day!",
+            "afternoon greeting": "Good afternoon! Keep shining!",
+            "night greeting": "Good night! Rest well.",
         };
 
-        function processCommand() {
-            const input = document.getElementById("userInput").value.toLowerCase();
-            const messages = document.getElementById("messages");
+        const chatOutput = document.getElementById("chat-output");
+        const userInput = document.getElementById("user-input");
+        const sendBtn = document.getElementById("send-btn");
 
-            const response = commands[input]
-                ? typeof commands[input] === "function"
-                    ? commands[input]()
-                    : commands[input]
-                : "I don't understand that command.";
-
-            messages.innerHTML += `<p><b>You:</b> ${input}</p><p><b>BrunoBot:</b> ${response}</p>`;
-            document.getElementById("userInput").value = "";
-            messages.scrollTop = messages.scrollHeight; // Auto-scroll to the bottom
+        function handleCommand(input) {
+            input = input.toLowerCase().trim();
+            if (commands[input]) {
+                return typeof commands[input] === "function" ? commands[input](input) : commands[input];
+            } else if (input.startsWith("my name is")) {
+                return commands["my name is"](input);
+            } else {
+                return "Sorry, I don't recognize that command.";
+            }
         }
 
-        function logout() {
-            localStorage.removeItem("loggedInUser");
+        sendBtn.addEventListener("click", () => {
+            const userText = userInput.value;
+            if (userText) {
+                const response = handleCommand(userText);
+                chatOutput.innerHTML += `<p><b>You:</b> ${userText}</p><p><b>BrunoBot:</b> ${response}</p>`;
+                chatOutput.scrollTop = chatOutput.scrollHeight;
+                userInput.value = "";
+            }
+        });
+
+        document.getElementById("logout").addEventListener("click", () => {
+            alert("You have been logged out.");
             window.location.href = "login.html";
-        }
-
-        // Ensure user is logged in
-        if (!localStorage.getItem("loggedInUser")) {
-            window.location.href = "login.html";
-        }
+        });
     </script>
 </body>
 </html>
