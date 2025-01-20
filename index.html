@@ -65,6 +65,17 @@
         .input-section button:hover {
             background: #45a049;
         }
+        .logout-btn {
+            margin: 10px;
+            background: #f44336;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 4px;
+            border: none;
+        }
+        .logout-btn:hover {
+            background: #d32f2f;
+        }
     </style>
 </head>
 <body>
@@ -84,7 +95,7 @@
             <input type="text" id="user-input" placeholder="Type your message here...">
             <button onclick="processInput()">Send</button>
         </div>
-        <button onclick="logout()" style="margin: 10px;">Logout</button>
+        <button class="logout-btn" onclick="logout()">Logout</button>
     </div>
 
     <script>
