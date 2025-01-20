@@ -1,1 +1,211 @@
-<iframe src="https://scratch.mit.edu/projects/17828009/embed" allowtransparency="true" width="485" height="402" frameborder="0" scrolling="no" allowfullscreen></iframe>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brunle</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 50px auto;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(5, 60px);
+            grid-gap: 10px;
+            justify-content: center;
+        }
+
+        .cell {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #d3d6da;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            font-weight: bold;
+            text-transform: uppercase;
+            background-color: #fff;
+        }
+
+        .cell.correct {
+            background-color: #6aaa64;
+            color: white;
+            border: none;
+        }
+
+        .cell.present {
+            background-color: #c9b458;
+            color: white;
+            border: none;
+        }
+
+        .cell.absent {
+            background-color: #787c7e;
+            color: white;
+            border: none;
+        }
+
+        .keyboard {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            max-width: 500px;
+            margin: 20px auto;
+        }
+
+        .key {
+            padding: 10px;
+            background-color: #d3d6da;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .key.enter {
+            grid-column: span 2;
+        }
+
+        .key.delete {
+            grid-column: span 2;
+        }
+
+        .key:hover {
+            background-color: #a9a9a9;
+        }
+
+        .key.disabled {
+            background-color: #787c7e;
+            color: white;
+            cursor: not-allowed;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Brunle</h1>
+        <div class="grid" id="grid">
+            <!-- The game grid -->
+        </div>
+        <div class="keyboard" id="keyboard">
+            <!-- The on-screen keyboard -->
+        </div>
+    </div>
+
+    <script>
+        const solution = "apple"; // The target word
+        const rows = 6;
+        const columns = 5;
+        let currentRow = 0;
+        let currentCol = 0;
+        let gameOver = false;
+
+        // Create the grid dynamically
+        const grid = document.getElementById('grid');
+        for (let i = 0; i < rows * columns; i++) {
+            const cell = document.createElement('div');
+            cell.className = 'cell';
+            grid.appendChild(cell);
+        }
+
+        const keyboardLayout = [
+            "qwertyuiop",
+            "asdfghjkl",
+            "zxcvbnm"
+        ];
+
+        const keyboard = document.getElementById('keyboard');
+        keyboardLayout.forEach(row => {
+            row.split("").forEach(key => {
+                const button = document.createElement('button');
+                button.textContent = key.toUpperCase();
+                button.className = 'key';
+                button.onclick = () => pressKey(key);
+                keyboard.appendChild(button);
+            });
+        });
+
+        // Add Enter and Delete keys
+        const enterKey = document.createElement('button');
+        enterKey.textContent = 'ENTER';
+        enterKey.className = 'key enter';
+        enterKey.onclick = submitWord;
+        keyboard.appendChild(enterKey);
+
+        const deleteKey = document.createElement('button');
+        deleteKey.textContent = 'DELETE';
+        deleteKey.className = 'key delete';
+        deleteKey.onclick = deleteLetter;
+        keyboard.appendChild(deleteKey);
+
+        function pressKey(letter) {
+            if (gameOver || currentCol >= columns || currentRow >= rows) return;
+
+            const gridCells = document.querySelectorAll('.cell');
+            const index = currentRow * columns + currentCol;
+            gridCells[index].textContent = letter.toUpperCase();
+            currentCol++;
+        }
+
+        function deleteLetter() {
+            if (currentCol > 0 && !gameOver) {
+                currentCol--;
+                const gridCells = document.querySelectorAll('.cell');
+                const index = currentRow * columns + currentCol;
+                gridCells[index].textContent = "";
+            }
+        }
+
+        function submitWord() {
+            if (currentCol < columns || gameOver) return;
+
+            const gridCells = document.querySelectorAll('.cell');
+            const startIndex = currentRow * columns;
+            const guess = Array.from(gridCells)
+                .slice(startIndex, startIndex + columns)
+                .map(cell => cell.textContent.toLowerCase())
+                .join("");
+
+            if (guess === solution) {
+                for (let i = 0; i < columns; i++) {
+                    gridCells[startIndex + i].classList.add('correct');
+                }
+                alert("Congratulations! You've guessed the word!");
+                gameOver = true;
+                return;
+            }
+
+            // Validate guess and colour the grid
+            for (let i = 0; i < columns; i++) {
+                const letter = guess[i];
+                if (solution[i] === letter) {
+                    gridCells[startIndex + i].classList.add('correct');
+                } else if (solution.includes(letter)) {
+                    gridCells[startIndex + i].classList.add('present');
+                } else {
+                    gridCells[startIndex + i].classList.add('absent');
+                }
+            }
+
+            currentRow++;
+            currentCol = 0;
+
+            if (currentRow >= rows) {
+                alert(`Game over! The word was: ${solution.toUpperCase()}`);
+                gameOver = true;
+            }
+        }
+    </script>
+</body>
+</html>
