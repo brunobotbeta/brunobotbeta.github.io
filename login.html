@@ -7,83 +7,156 @@
     <style>
         body {
             font-family: Arial, sans-serif;
-            background-image: url('https://londonmymind.com/wp-content/uploads/2022/01/Sunset-in-London-Hero-2-1024x683.jpg');
-            background-size: cover;
-            color: white;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f9;
         }
-        .login-container {
-            max-width: 400px;
-            margin: 100px auto;
+        .container {
+            width: 90%;
+            max-width: 500px;
+            margin: 50px auto;
+            background: white;
             padding: 20px;
-            background-color: rgba(0, 0, 0, 0.6);
             border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        header {
+            background: #4CAF50;
+            color: white;
+            padding: 10px;
             text-align: center;
+            margin-bottom: 20px;
         }
-        h1 {
-            color: #FFCC00;
+        .input-group {
+            margin-bottom: 15px;
         }
-        input[type="text"], input[type="password"] {
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input {
             width: 100%;
             padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-            border: 2px solid #FFCC00;
-            color: #000;
+            border: 1px solid #ddd;
+            border-radius: 4px;
         }
-        .button {
-            background-color: #FFCC00;
-            color: black;
+        .login-button {
+            background: #4CAF50;
+            color: white;
             border: none;
             padding: 10px 20px;
-            font-size: 16px;
+            border-radius: 4px;
             cursor: pointer;
-            border-radius: 5px;
+            width: 100%;
         }
-        .button:hover {
-            background-color: #FF9900;
+        .login-button:hover {
+            background: #45a049;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
+    <div class="container">
+        <header>
+            <h1>Login to BrunoBot</h1>
+        </header>
 
-    <div class="login-container">
-        <h1>BrunoBot Login</h1>
         <form id="loginForm">
-            <input type="text" id="username" placeholder="Username" required>
-            <input type="password" id="password" placeholder="Password" required>
-            <button type="submit" class="button">Login</button>
+            <div class="input-group">
+                <label for="username">Username</label>
+                <input type="text" id="username" required>
+            </div>
+            <div class="input-group">
+                <label for="password">Password</label>
+                <input type="password" id="password" required>
+            </div>
+            <button type="submit" class="login-button">Login</button>
+            <p class="error-message" id="error-message"></p>
         </form>
-        <p id="error-message" style="color: red;"></p>
+
+        <h3>Other Users:</h3>
+        <form id="userListForm">
+            <div class="input-group">
+                <label for="user1">Username 1</label>
+                <input type="text" id="user1">
+                <label for="pass1">Password 1</label>
+                <input type="password" id="pass1">
+            </div>
+            <div class="input-group">
+                <label for="user2">Username 2</label>
+                <input type="text" id="user2">
+                <label for="pass2">Password 2</label>
+                <input type="password" id="pass2">
+            </div>
+            <div class="input-group">
+                <label for="user3">Username 3</label>
+                <input type="text" id="user3">
+                <label for="pass3">Password 3</label>
+                <input type="password" id="pass3">
+            </div>
+            <!-- Repeat for 10 slots -->
+            <div class="input-group">
+                <label for="user10">Username 10</label>
+                <input type="text" id="user10">
+                <label for="pass10">Password 10</label>
+                <input type="password" id="pass10">
+            </div>
+        </form>
     </div>
 
     <script>
-        // Predefined users
-        const users = {
-            "Bruno": "Bruno123",
-            "Alice": "Alice123",
-            "Bob": "Bob123"
-        };
+        const users = [
+            { username: "Bruno", password: "Bruno" },
+            { username: "", password: "" },
+            { username: "", password: "" },
+            { username: "", password: "" },
+            { username: "", password: "" },
+            { username: "", password: "" },
+            { username: "", password: "" },
+            { username: "", password: "" },
+            { username: "", password: "" },
+            { username: "", password: "" },
+            { username: "", password: "" }
+        ];
 
-        // Handle the login form submission
+        // Check if the credentials match
         document.getElementById("loginForm").addEventListener("submit", function(event) {
             event.preventDefault();
 
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
+            let isAuthenticated = false;
 
-            // Check if the username and password match any of the predefined users
-            if (users[username] && users[username] === password) {
-                // If valid, store the username and redirect to the main page
-                localStorage.setItem("username", username);
-                window.location.href = "index.html"; // Redirect to index.html
+            // Check if the entered credentials match any of the preset usernames and passwords
+            for (let i = 0; i < users.length; i++) {
+                if (users[i].username === username && users[i].password === password) {
+                    isAuthenticated = true;
+                    break;
+                }
+            }
+
+            // Handle login
+            if (isAuthenticated) {
+                localStorage.setItem("loggedInUser", username);  // Store the logged-in user in localStorage
+                window.location.href = "index.html";  // Redirect to the index page
             } else {
-                // If not valid, display an error message
-                document.getElementById("error-message").textContent = "Incorrect username or password.";
+                document.getElementById("error-message").textContent = "Invalid username or password!";
             }
         });
-    </script>
 
+        // Fill in default usernames and passwords
+        function populateUsers() {
+            for (let i = 1; i <= 10; i++) {
+                document.getElementById(`user${i}`).value = users[i-1].username;
+                document.getElementById(`pass${i}`).value = users[i-1].password;
+            }
+        }
+
+        // Populate the user list when the page loads
+        window.onload = populateUsers;
+    </script>
 </body>
 </html>
