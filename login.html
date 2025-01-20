@@ -7,156 +7,74 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom, #101820, #36454F);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
-            padding: 0;
-            background-color: #f4f4f9;
         }
-        .container {
-            width: 90%;
-            max-width: 500px;
-            margin: 50px auto;
-            background: white;
+        .login-container {
+            background: #20232A;
             padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            width: 300px;
         }
-        header {
-            background: #4CAF50;
-            color: white;
-            padding: 10px;
+        .login-container h2 {
             text-align: center;
             margin-bottom: 20px;
         }
-        .input-group {
-            margin-bottom: 15px;
-        }
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-        }
-        .input-group input {
+        input[type="text"], input[type="password"] {
             width: 100%;
             padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            margin: 10px 0;
+            border: 1px solid #444;
+            border-radius: 5px;
+            background: #333;
+            color: #fff;
         }
-        .login-button {
-            background: #4CAF50;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 4px;
-            cursor: pointer;
+        button {
             width: 100%;
+            padding: 10px;
+            background: #4CAF50;
+            border: none;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
         }
-        .login-button:hover {
-            background: #45a049;
-        }
-        .error-message {
-            color: red;
-            margin-top: 10px;
+        button:hover {
+            background: #45A049;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Login to BrunoBot</h1>
-        </header>
-
-        <form id="loginForm">
-            <div class="input-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" required>
-            </div>
-            <div class="input-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" required>
-            </div>
-            <button type="submit" class="login-button">Login</button>
-            <p class="error-message" id="error-message"></p>
-        </form>
-
-        <h3>Other Users:</h3>
-        <form id="userListForm">
-            <div class="input-group">
-                <label for="user1">Username 1</label>
-                <input type="text" id="user1">
-                <label for="pass1">Password 1</label>
-                <input type="password" id="pass1">
-            </div>
-            <div class="input-group">
-                <label for="user2">Username 2</label>
-                <input type="text" id="user2">
-                <label for="pass2">Password 2</label>
-                <input type="password" id="pass2">
-            </div>
-            <div class="input-group">
-                <label for="user3">Username 3</label>
-                <input type="text" id="user3">
-                <label for="pass3">Password 3</label>
-                <input type="password" id="pass3">
-            </div>
-            <!-- Repeat for 10 slots -->
-            <div class="input-group">
-                <label for="user10">Username 10</label>
-                <input type="text" id="user10">
-                <label for="pass10">Password 10</label>
-                <input type="password" id="pass10">
-            </div>
-        </form>
+    <div class="login-container">
+        <h2>BrunoBot Login</h2>
+        <input type="text" id="username" placeholder="Username">
+        <input type="password" id="password" placeholder="Password">
+        <button onclick="login()">Login</button>
+        <p id="error" style="color: red; text-align: center;"></p>
     </div>
-
     <script>
-        const users = [
-            { username: "Bruno", password: "Bruno" },
-            { username: "", password: "" },
-            { username: "", password: "" },
-            { username: "", password: "" },
-            { username: "", password: "" },
-            { username: "", password: "" },
-            { username: "", password: "" },
-            { username: "", password: "" },
-            { username: "", password: "" },
-            { username: "", password: "" },
-            { username: "", password: "" }
-        ];
+        const users = {
+            "Bruno": "Bruno",
+            "User1": "password1",
+            "User2": "password2"
+        };
 
-        // Check if the credentials match
-        document.getElementById("loginForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-
+        function login() {
             const username = document.getElementById("username").value;
             const password = document.getElementById("password").value;
-            let isAuthenticated = false;
-
-            // Check if the entered credentials match any of the preset usernames and passwords
-            for (let i = 0; i < users.length; i++) {
-                if (users[i].username === username && users[i].password === password) {
-                    isAuthenticated = true;
-                    break;
-                }
-            }
-
-            // Handle login
-            if (isAuthenticated) {
-                localStorage.setItem("loggedInUser", username);  // Store the logged-in user in localStorage
-                window.location.href = "index.html";  // Redirect to the index page
+            if (users[username] && users[username] === password) {
+                localStorage.setItem("loggedInUser", username);
+                window.location.href = "index.html";
             } else {
-                document.getElementById("error-message").textContent = "Invalid username or password!";
-            }
-        });
-
-        // Fill in default usernames and passwords
-        function populateUsers() {
-            for (let i = 1; i <= 10; i++) {
-                document.getElementById(`user${i}`).value = users[i-1].username;
-                document.getElementById(`pass${i}`).value = users[i-1].password;
+                document.getElementById("error").innerText = "Invalid username or password!";
             }
         }
-
-        // Populate the user list when the page loads
-        window.onload = populateUsers;
     </script>
 </body>
 </html>
