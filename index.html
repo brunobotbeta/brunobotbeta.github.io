@@ -3,80 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bruno's Tools</title>
+    <title>Bruno's Tools - BrunoBot</title>
     <style>
         body {
             font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #87CEFA, #FFB6C1);
-            color: #333;
+            background: linear-gradient(to bottom, #87CEEB, #FFB6C1);
             margin: 0;
             padding: 0;
         }
-        #container {
-            max-width: 600px;
-            margin: 50px auto;
-            padding: 20px;
-            background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        #header {
-            text-align: center;
-            font-size: 24px;
-            margin-bottom: 20px;
-        }
-        #chat-output {
-            height: 300px;
-            overflow-y: auto;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            padding: 10px;
-            background: #f9f9f9;
-            margin-bottom: 10px;
-        }
-        #input-container {
+        .container {
             display: flex;
+            flex-direction: column;
             align-items: center;
+            justify-content: center;
+            height: 100vh;
         }
-        #input-container input {
-            flex: 1;
-            padding: 10px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        #input-container button {
-            padding: 10px;
-            margin-left: 10px;
-            border: none;
-            background: #007BFF;
+        .chat-box {
+            width: 50%;
+            background: #333;
             color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
         }
-        #logout {
-            display: block;
+        .chat-box p {
+            margin: 10px 0;
+        }
+        #user-input {
+            width: calc(100% - 60px);
+            padding: 10px;
+            margin-top: 10px;
+        }
+        #send-btn {
+            padding: 10px 20px;
+            background-color: #007BFF;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            margin-left: 5px;
+        }
+        #send-btn:hover {
+            background-color: #0056b3;
+        }
+        .logout {
             margin-top: 20px;
-            text-align: center;
-            color: #007BFF;
+            padding: 10px 20px;
+            background-color: #FF5733;
+            border: none;
+            color: white;
             cursor: pointer;
+            border-radius: 5px;
         }
-        #logout:hover {
-            text-decoration: underline;
+        .logout:hover {
+            background-color: #C70039;
         }
     </style>
 </head>
 <body>
-    <div id="container">
-        <div id="header">Welcome to BrunoBot</div>
-        <div id="chat-output"></div>
-        <div id="input-container">
-            <input type="text" id="user-input" placeholder="Ask BrunoBot something...">
+    <div class="container">
+        <div class="chat-box" id="chat-output">
+            <p><b>BrunoBot:</b> Hello! Type a command to get started.</p>
+        </div>
+        <div>
+            <input type="text" id="user-input" placeholder="Type a command...">
             <button id="send-btn">Send</button>
         </div>
-        <div id="logout">Logout</div>
+        <button class="logout" onclick="logout()">Logout</button>
     </div>
 
     <script>
+        const chatOutput = document.getElementById("chat-output");
+        const userInput = document.getElementById("user-input");
+        const sendBtn = document.getElementById("send-btn");
+
         const commands = {
             "hello": "Hello! How can I assist you today?",
             "hi": "Hi there! What can I help you with?",
@@ -88,73 +87,81 @@
                 localStorage.setItem('name', name);
                 return `Nice to meet you, ${name}!`;
             },
-            "what is DayBay?": "DayBay is a paper computer company made by Bruno’s friend Kyra.",
+            "what is daybay?": "DayBay is a paper computer company made by Bruno’s friend Kyra.",
             "time in london": function() {
                 return `The current time in London is ${new Date().toLocaleString("en-GB", { timeZone: "Europe/London" })}.`;
             },
             "weather in london": "The weather in London is currently sunny with 15°C.",
+            "facts": "Did you know that honey never spoils? Archaeologists have found pots of honey in ancient tombs that are still good to eat!",
             "tell me a joke": "Why don't skeletons fight each other? They don’t have the guts!",
             "give me a random number": function() {
                 return `Here is a random number: ${Math.floor(Math.random() * 100) + 1}.`;
             },
-            "give me an inspirational quote": "“The only way to do great work is to love what you do.” – Steve Jobs",
-            "who is nikola tesla": "Nikola Tesla was a Serbian-American inventor known for his work in alternating current (AC) electricity.",
-            "capital of france": "The capital of France is Paris.",
-            "largest ocean": "The largest ocean is the Pacific Ocean.",
-            "eiffel tower info": "The Eiffel Tower is in Paris, France. It was completed in 1889.",
-            "tell me a math fact": "Did you know? A googol is the digit 1 followed by 100 zeros.",
-            "random word": function() {
-                const words = ["Euphoria", "Resilience", "Epiphany", "Bliss", "Serendipity"];
-                return `Here’s a random word: ${words[Math.floor(Math.random() * words.length)]}.`;
+            "good morning": "Good morning! I hope you have a wonderful day.",
+            "good night": "Good night! Sleep well.",
+            "tell me a math fact": "Did you know? Zero is the only real number that is neither negative nor positive.",
+            "who is albert einstein": "Albert Einstein developed the theory of relativity, one of the two pillars of modern physics.",
+            "what is brunle": "Brunle is a word guessing game where you try to guess a 5-letter word!",
+            "what is the capital of france": "The capital of France is Paris.",
+            "tell me about world war ii": "World War II was a global war that lasted from 1939 to 1945, involving most of the world's nations.",
+            "tell me about the eiffel tower": "The Eiffel Tower is a wrought-iron lattice tower on the Champ de Mars in Paris, France.",
+            "give me an inspirational quote": "“The best way to predict the future is to create it.” – Peter Drucker",
+            "give me a recipe": "How about making pancakes? You'll need flour, eggs, milk, and a pinch of salt!",
+            "what is the largest ocean": "The Pacific Ocean is the largest and deepest ocean on Earth.",
+            "how are you": "I'm just a bot, but I'm here to help you!",
+            "tell me about london": "London is the capital of England and the United Kingdom, known for its history and landmarks.",
+            "tell me about kyra": "Kyra is Bruno's friend and the creator of DayBay, a paper computer company.",
+            "tell me a fun fact": "Did you know? A group of flamingos is called a 'flamboyance.'",
+            "calculate": function(input) {
+                try {
+                    const calculation = eval(input.replace("calculate ", ""));
+                    return `The result is ${calculation}.`;
+                } catch {
+                    return "I couldn't calculate that. Please try again.";
+                }
             },
-            "fact about the moon": "The Moon is about 1/6th the gravity of Earth.",
-            "favourite animal?": "Dogs are Bruno's favourite!",
-            "who is bruno?": "Bruno is an amazing creator!",
-            "what is brunle?": "Brunle is a word guessing game similar to Wordle.",
-            "recipe idea": "Make some pancakes with flour, eggs, milk, and syrup!",
-            "favourite colour?": "Blue is often considered a calming colour.",
-            "what is AI?": "AI stands for Artificial Intelligence, used in tools like BrunoBot.",
-            "population of spain": "The population of Spain is about 47 million.",
-            "tell me about WWII": "WWII lasted from 1939 to 1945 and involved many countries worldwide.",
-            "what is coding?": "Coding is writing instructions for computers to follow.",
-            "favourite sport": "Football is the world's most popular sport.",
-            "tell me about cats": "Cats are domesticated mammals known for their agility and independence.",
-            "fact about honey": "Honey never spoils and can last thousands of years.",
-            "funny fact": "Bananas are berries, but strawberries aren’t!",
-            "morning greeting": "Good morning! Have a great day!",
-            "afternoon greeting": "Good afternoon! Keep shining!",
-            "night greeting": "Good night! Rest well.",
+            "play music": "I'm sorry, I can't play music right now.",
+            "tell me a random word": function() {
+                const words = ['Serendipity', 'Euphoria', 'Bliss', 'Epiphany', 'Resilience'];
+                return `Here’s a random word: ${words[Math.floor(Math.random() * words.length)]}.`;
+            }
         };
 
-        const chatOutput = document.getElementById("chat-output");
-        const userInput = document.getElementById("user-input");
-        const sendBtn = document.getElementById("send-btn");
-
-        function handleCommand(input) {
-            input = input.toLowerCase().trim();
-            if (commands[input]) {
-                return typeof commands[input] === "function" ? commands[input](input) : commands[input];
-            } else if (input.startsWith("my name is")) {
-                return commands["my name is"](input);
-            } else {
-                return "Sorry, I don't recognize that command.";
+        function matchCommand(input) {
+            input = input.toLowerCase();
+            for (let command in commands) {
+                if (input.startsWith(command)) {
+                    return commands[command];
+                }
             }
+            return null;
         }
 
         sendBtn.addEventListener("click", () => {
-            const userText = userInput.value;
+            const userText = userInput.value.trim();
             if (userText) {
-                const response = handleCommand(userText);
+                let response;
+                const commandFunc = matchCommand(userText);
+
+                if (commandFunc) {
+                    if (typeof commandFunc === "function") {
+                        response = commandFunc(userText);
+                    } else {
+                        response = commandFunc;
+                    }
+                } else {
+                    response = "Sorry, I don't recognize this command.";
+                }
+
                 chatOutput.innerHTML += `<p><b>You:</b> ${userText}</p><p><b>BrunoBot:</b> ${response}</p>`;
                 chatOutput.scrollTop = chatOutput.scrollHeight;
                 userInput.value = "";
             }
         });
 
-        document.getElementById("logout").addEventListener("click", () => {
-            alert("You have been logged out.");
+        function logout() {
             window.location.href = "login.html";
-        });
+        }
     </script>
 </body>
 </html>
