@@ -6,107 +6,106 @@
     <title>BrunoBot</title>
     <style>
         body {
-            font-family: 'Arial', sans-serif;
-            background-image: url('https://londonmymind.com/wp-content/uploads/2022/01/Sunset-in-London-Hero-2-1024x683.jpg');
-            background-size: cover;
-            color: white;
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
+            background-color: #f4f4f9;
         }
         .container {
+            width: 90%;
             max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: rgba(0, 0, 0, 0.6);
+            margin: 20px auto;
+            background: white;
             border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
-        h1 {
-            text-align: center;
-            color: #FFCC00;
-        }
-        #chatbox {
-            max-height: 400px;
-            overflow-y: auto;
-            background-color: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            border-radius: 8px;
-            margin-bottom: 10px;
-        }
-        #userInput {
-            width: 100%;
-            padding: 10px;
-            border-radius: 8px;
-            margin-top: 10px;
-            border: 2px solid #FFCC00;
-            color: #000;
-        }
-        .chat-message {
-            margin: 10px 0;
-            padding: 10px;
-            background-color: #333;
-            border-radius: 8px;
-        }
-        .user-message {
-            background-color: #FFCC00;
-            color: black;
-            text-align: left;
-        }
-        .bot-message {
-            background-color: #444;
+        header {
+            background: #4CAF50;
             color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .chat-box {
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+        .chat-box p {
+            margin: 5px 0;
+        }
+        .chat-box .bot {
+            color: #4CAF50;
+        }
+        .chat-box .user {
+            color: #333;
             text-align: right;
         }
-        .button {
-            background-color: #FFCC00;
-            color: black;
+        .input-section {
+            padding: 10px;
+            display: flex;
+            border-top: 1px solid #ddd;
+        }
+        .input-section input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+        .input-section button {
+            background: #4CAF50;
+            color: white;
             border: none;
             padding: 10px 20px;
-            font-size: 16px;
+            border-radius: 4px;
             cursor: pointer;
-            border-radius: 5px;
-            margin: 10px 0;
-            display: block;
-            width: 100%;
         }
-        .button:hover {
-            background-color: #FF9900;
-        }
-        .message-box {
-            margin-bottom: 15px;
+        .input-section button:hover {
+            background: #45a049;
         }
     </style>
 </head>
 <body>
+    <script>
+        // Redirect to login.html if user is not logged in
+        if (!localStorage.getItem("loggedInUser")) {
+            window.location.href = "login.html";
+        }
+    </script>
 
     <div class="container">
-        <h1>BrunoBot</h1>
-        <div id="chatbox">
-            <!-- Messages will appear here -->
+        <header>
+            <h1>Welcome to BrunoBot!</h1>
+        </header>
+        <div class="chat-box" id="chat-box"></div>
+        <div class="input-section">
+            <input type="text" id="user-input" placeholder="Type your message here...">
+            <button onclick="processInput()">Send</button>
         </div>
-        <input type="text" id="userInput" placeholder="Type a command..." onkeydown="if(event.key === 'Enter'){ processInput(); }">
-        <button class="button" onclick="processInput()">Send</button>
-        <button class="button" onclick="logout()">Logout</button>
+        <button onclick="logout()" style="margin: 10px;">Logout</button>
     </div>
 
     <script>
         const commands = {
             "hello": "Hello! How can I assist you today?",
             "hi": "Hello! How can I assist you today?",
-            "what is my name": function() {
+            "what is my name": function () {
                 return `Your name is ${localStorage.getItem('name') || 'Bruno'}.`;
             },
-            "time in london": function() {
+            "time in london": function () {
                 return `The current time in London is ${new Date().toLocaleString("en-GB", { timeZone: "Europe/London" })}.`;
             },
             "weather in london": "The weather in London is currently sunny with 15°C.",
             "what is brunle": "Brunle is a word guessing game where you try to guess a 5-letter word!",
             "facts": "Did you know that honey never spoils? Archaeologists have found pots of honey in ancient tombs that are still good to eat!",
-            "name my city": function() {
+            "name my city": function () {
                 return `Your favorite city is ${localStorage.getItem('city') || 'London'}.`;
             },
             "what is your name": "I am BrunoBot. Nice to meet you!",
             "help": "You can ask me to tell you the time, weather, facts, play Brunle, and more! Type in a command and I’ll assist.",
-            "give me a random number": function() {
+            "give me a random number": function () {
                 return `Here is a random number: ${Math.floor(Math.random() * 100) + 1}.`;
             },
             "tell me a joke": "Why don't skeletons fight each other? They don’t have the guts!",
@@ -120,60 +119,33 @@
             "who is nikola tesla": "Nikola Tesla was a Serbian-American inventor and electrical engineer known for his work in the development of alternating current (AC) electricity.",
             "what is the capital of france": "The capital of France is Paris.",
             "tell me about albert einstein": "Albert Einstein was a German-born theoretical physicist best known for developing the theory of relativity, one of the two pillars of modern physics.",
-            "give me a random word": function() {
+            "give me a random word": function () {
                 const words = ['Serendipity', 'Euphoria', 'Bliss', 'Epiphany', 'Resilience'];
                 return `Here’s a random word: ${words[Math.floor(Math.random() * words.length)]}.`;
             },
-            "what is the largest ocean": "The largest ocean is the Pacific Ocean, covering more than 63 million square miles (165 million square kilometers).",
-            "who is cleopatra": "Cleopatra was the last active ruler of the Ptolemaic Kingdom of Egypt, known for her political acumen and relationships with Julius Caesar and Mark Antony."
+            "what is the largest ocean": "The largest ocean is the Pacific Ocean, covering more than 63 million square miles (165 million square kilometers)."
         };
 
         function processInput() {
-            const userInput = document.getElementById('userInput').value.toLowerCase();
-            document.getElementById('userInput').value = '';
-            const chatbox = document.getElementById('chatbox');
-            
-            if (userInput.trim() === '') return;
-            
-            let response = "I'm sorry, I didn't understand that.";
-            if (commands[userInput]) {
-                response = typeof commands[userInput] === 'function' ? commands[userInput]() : commands[userInput];
+            const input = document.getElementById("user-input").value.toLowerCase().trim();
+            const chatBox = document.getElementById("chat-box");
+            let response;
+
+            if (commands[input]) {
+                response = typeof commands[input] === "function" ? commands[input]() : commands[input];
             } else {
-                const commandFound = Object.keys(commands).find(key => userInput.includes(key));
-                if (commandFound) {
-                    response = typeof commands[commandFound] === 'function' ? commands[commandFound]() : commands[commandFound];
-                }
+                response = "I'm sorry, I didn't understand that.";
             }
-            
-            const messageBox = document.createElement('div');
-            messageBox.classList.add('chat-message', 'user-message');
-            messageBox.textContent = userInput;
-            chatbox.appendChild(messageBox);
-            
-            const botMessageBox = document.createElement('div');
-            botMessageBox.classList.add('chat-message', 'bot-message');
-            botMessageBox.textContent = response;
-            chatbox.appendChild(botMessageBox);
-            
-            chatbox.scrollTop = chatbox.scrollHeight;
+
+            chatBox.innerHTML += `<p class="user">You: ${input}</p>`;
+            chatBox.innerHTML += `<p class="bot">Bot: ${response}</p>`;
+            document.getElementById("user-input").value = "";
         }
 
         function logout() {
-            localStorage.clear();
+            localStorage.removeItem("loggedInUser");
             window.location.href = "login.html";
         }
-
-        // Make sure to load previous messages when a user logs in or when refreshing the page
-        if(localStorage.getItem('name')) {
-            const name = localStorage.getItem('name');
-            const welcomeMessage = `Welcome back, ${name}! How can I assist you today?`;
-            const welcomeBox = document.createElement('div');
-            welcomeBox.classList.add('chat-message', 'bot-message');
-            welcomeBox.textContent = welcomeMessage;
-            document.getElementById('chatbox').appendChild(welcomeBox);
-        }
-
     </script>
-
 </body>
 </html>
